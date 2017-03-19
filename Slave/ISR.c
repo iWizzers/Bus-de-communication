@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Description: Permet de gérer les entrées et les sorties                      */
+/* Description: Gestion des interruptions                                       */
 /*                                                                              */
 /* Auteurs: Mickaël  MERCIER                                                    */
 /*          Xingyong ZHAO                                                       */
@@ -8,12 +8,12 @@
 
 
 #include <msp430g2231.h>
-#include "GPIO.h"
+#include "SPI.h"
 
 
 
 //************************************************************
-// Fonction InitGPIO
+// Routine de service d'interruption SPI
 //
 //       Entrées :
 //                 NULL
@@ -21,18 +21,22 @@
 //       Sorties :
 //                 NULL
 //************************************************************
-void InitGPIO(void)
+#pragma vector=USI_VECTOR
+__interrupt void USI_ISR(void)
 {
-	P1DIR = 0;
-	P1DIR |= BIT0;		// LED rouge en sortie
-	P1DIR |= BIT2; 		// Réglage du servomoteur en sortie
-	P1DIR |= BIT6;		// SDO en sortie
+	unsigned char caractere = RXSPI();	// Réception du caractère
 
-
-	P1OUT = 0;
-	P1OUT |= BIT0;		// Activation LED rouge pour visualiser l'intialisation
-
-
-	P1SEL |= BIT2; 					// Sélection fonction TA0.1
-	P1SEL |= BIT5 + BIT6 + BIT7;	// Sélection du SPI (clock, sortie et entrée)
+	switch (caractere) {
+	case 'a':
+		P1OUT |= BIT0;		// Allumage de la LED
+		TXSPI('a');			// Envoi du caractère 'a'
+		break;
+	case 'e':
+		P1OUT &= ~BIT0;		// Extinction de la LED
+		TXSPI('e');			// Envoi du caractère 'e'
+		break;
+	default:
+		TXSPI('0');			// Envoi du caractère '0' = pas d'action
+		break;
+	}
 }

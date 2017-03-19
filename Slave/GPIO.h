@@ -3,7 +3,7 @@
 
 
 
-void InitPort(void);
+void InitGPIO(void);	// Initialisation des entrées-sorties
 
 
 

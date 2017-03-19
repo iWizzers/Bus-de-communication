@@ -3,10 +3,11 @@
 
 
 
-void Send_char_SPI(unsigned char carac);
-unsigned char listen_SPI();
+void 			InitSPI	(void);					// Initialisation du SPI
 
-void InitSPI(void);
+void 			TXSPI	(unsigned char carac);	// Transmission d'un caractère
+
+unsigned char 	RXSPI	(void);					// Réception d'un caractère
 
 
 

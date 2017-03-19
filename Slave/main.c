@@ -1,46 +1,73 @@
+/* ============================================================================ */
+/* Description: A l'aide du MSP430G2231, il est possible d'effectuer une        */
+/* communication SPI. De plus, un servomoteur effectue une rotation de 180°     */
+/* afin qu'un capteur puisse détecter un obstacle.                              */
+/*                                                                              */
+/* Auteurs: Mickaël  MERCIER                                                    */
+/*          Xingyong ZHAO                                                       */
+/* ============================================================================ */
+
+
+
 #include <msp430g2231.h>
 #include "GPIO.h"
 #include "SPI.h"
+#include "Timer.h"
 
 
 
+//************************************************************
+// Fonction main
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 NULL
+//************************************************************
 int main(void)
 {
-	WDTCTL = WDTPW + WDTHOLD;             // Stop watchdog timer
+	WDTCTL = WDTPW + WDTHOLD; // Stoppe le watchdog
 
 
-	unsigned char receive;
+	// INITIALISATION
+	InitGPIO();	// Entrées-sorties
+	InitSPI();	// SPI en esclave
+	InitPWM();	// PWM du servomoteur
 
-	InitPort();
-	InitSPI();
 
-	//__bis_SR_register(GIE);   // Enter LPM0 w/ interrupt
+	// Exctinction de la LED rouge si l'initialisation est un succès
+	P1OUT &= ~BIT0;
 
-	while (1)
-	{
-		receive = listen_SPI();// Scrutation
-		switch(receive)
-		{
-		case 'a':
-			P1OUT |= BIT0;
-			Send_char_SPI('a');
-			break;
-		case 'e':
-			P1OUT &= ~BIT0;
-			Send_char_SPI('e');
-			break;
-		default:
-			Send_char_SPI('b');
-			break;
-		}
+
+	// Activition de l'interruption SPI
+	__enable_interrupt();
+
+
+	// Gestion du servomoteur
+	while (1) {
+		__delay_cycles(1000000); // Delai 1 seconde
+
+		/* Passage de X° à 0°
+		 *          ______________
+		 *         |   ________   |
+		 *         |  |        |  |
+		 *         X  | Servo  |  V -> 0°
+		 *            |________|
+		 */
+		TACCR1 = 500;
+
+		__delay_cycles(1000000); // Delai 1 seconde
+
+		/* Passage de X° à 180°
+		 *          ______________
+		 *         |   ________   |
+		 *         |  |        |  |
+		 * 180° <- V  | Servo  |  X
+		 *            |________|
+		 */
+		TACCR1 = 2500;	// 180°
 	}
+
+	return 0;
 }
-
-
-
-/*#pragma vector=USI_VECTOR
-__interrupt void universal_serial_interface(void)
-{
-
-}
-*/

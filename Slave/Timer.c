@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Description: Permet de gérer les entrées et les sorties                      */
+/* Description: Permet de gérer la PWM du servomoteur                           */
 /*                                                                              */
 /* Auteurs: Mickaël  MERCIER                                                    */
 /*          Xingyong ZHAO                                                       */
@@ -8,12 +8,12 @@
 
 
 #include <msp430g2231.h>
-#include "GPIO.h"
+#include "Timer.h"
 
 
 
 //************************************************************
-// Fonction InitGPIO
+// Fonction InitPWM
 //
 //       Entrées :
 //                 NULL
@@ -21,18 +21,10 @@
 //       Sorties :
 //                 NULL
 //************************************************************
-void InitGPIO(void)
+void InitPWM(void)
 {
-	P1DIR = 0;
-	P1DIR |= BIT0;		// LED rouge en sortie
-	P1DIR |= BIT2; 		// Réglage du servomoteur en sortie
-	P1DIR |= BIT6;		// SDO en sortie
-
-
-	P1OUT = 0;
-	P1OUT |= BIT0;		// Activation LED rouge pour visualiser l'intialisation
-
-
-	P1SEL |= BIT2; 					// Sélection fonction TA0.1
-	P1SEL |= BIT5 + BIT6 + BIT7;	// Sélection du SPI (clock, sortie et entrée)
+	TACTL = (TASSEL_2 | MC_1 | ID_0); 	// Source SMCLK pour TimerA, mode comptage Up, pas de prédivision
+	TACCTL1 = OUTMOD_7; 				// Activation mode de sortie n°7
+	TACCR0 = 20000; 					// Détermine la période du signal
+	TACCR1 = 500;						// Initialisation à 0°
 }

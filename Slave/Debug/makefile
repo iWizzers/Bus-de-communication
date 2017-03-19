@@ -11,7 +11,9 @@ GEN_CMDS__FLAG :=
 
 ORDERED_OBJS += \
 "./GPIO.obj" \
+"./ISR.obj" \
 "./SPI.obj" \
+"./Timer.obj" \
 "./main.obj" \
 "../lnk_msp430g2231.cmd" \
 $(GEN_CMDS__FLAG) \
@@ -122,40 +124,40 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-TP2\ -\ Bus\ de\ communication.out \
+Slave.out \
 
 EXE_OUTPUTS__QUOTED += \
-"TP2 - Bus de communication.out" \
+"Slave.out" \
 
 BIN_OUTPUTS += \
-TP2\ -\ Bus\ de\ communication.hex \
+Slave.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"TP2 - Bus de communication.hex" \
+"Slave.hex" \
 
 
 # All Target
-all: TP2\ -\ Bus\ de\ communication.out
+all: Slave.out
 
 # Tool invocations
-TP2\ -\ Bus\ de\ communication.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+Slave.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/cl430" -vmsp --use_hw_mpy=none --advice:power=all -g --define=__MSP430G2231__ --diag_warning=225 --diag_wrap=off --display_error_number --printf_support=minimal -z -m"TP2 - Bus de communication.map" --stack_size=50 --heap_size=0 -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="TP2 - Bus de communication_linkInfo.xml" --use_hw_mpy=none --rom_model -o "TP2 - Bus de communication.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/cl430" -vmsp --use_hw_mpy=none --advice:power=all -g --define=__MSP430G2231__ --diag_warning=225 --diag_wrap=off --display_error_number --printf_support=minimal -z -m"Slave.map" --stack_size=50 --heap_size=0 -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="Slave_linkInfo.xml" --use_hw_mpy=none --rom_model -o "Slave.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-TP2\ -\ Bus\ de\ communication.hex: $(EXE_OUTPUTS)
+Slave.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: MSP430 Hex Utility'
-	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/hex430" --memwidth=8 --romwidth=8 -o "TP2 - Bus de communication.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/hex430" --memwidth=8 --romwidth=8 -o "Slave.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "GPIO.d" "SPI.d" "main.d" 
-	-$(RM) "GPIO.obj" "SPI.obj" "main.obj" 
+	-$(RM) "GPIO.d" "ISR.d" "SPI.d" "Timer.d" "main.d" 
+	-$(RM) "GPIO.obj" "ISR.obj" "SPI.obj" "Timer.obj" "main.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

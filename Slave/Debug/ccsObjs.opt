@@ -1,1 +1,1 @@
-"./GPIO.obj" "./SPI.obj" "./main.obj" "../lnk_msp430g2231.cmd" -llibc.a 
+"./GPIO.obj" "./ISR.obj" "./SPI.obj" "./Timer.obj" "./main.obj" "../lnk_msp430g2231.cmd" -llibc.a 
