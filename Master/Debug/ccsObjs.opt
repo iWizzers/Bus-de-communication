@@ -1,1 +1,1 @@
-"./ADC.obj" "./GPIO.obj" "./ISR.obj" "./SPI.obj" "./Timer.obj" "./UART.obj" "./main.obj" "../lnk_msp430g2553.cmd" -llibc.a 
+"./ADC.obj" "./GPIO.obj" "./ISR.obj" "./Robot.obj" "./SPI.obj" "./Timer.obj" "./UART.obj" "./main.obj" "../lnk_msp430g2553.cmd" -llibc.a 

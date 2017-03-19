@@ -1,38 +1,101 @@
+/* ============================================================================ */
+/* Description: Permet de gérer la PWM du servomoteur                           */
+/*                                                                              */
+/* Auteurs: Mickaël  MERCIER                                                    */
+/*          Xingyong ZHAO                                                       */
+/* ============================================================================ */
+
+
+
 #include <msp430g2553.h>
 #include "Timer.h"
 #include "global.h"
-#include "UART.h"
 
 
 
+
+//************************************************************
+// Fonction InitPWM
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 char * : chaine de caractère donnant l'état de l'initialisation
+//************************************************************
 char * InitPWM(void)
 {
-	/*P1DIR |= BIT4; 	// Réglages des roues en sorties (sens + PWM)
+	// Timer 0
+	TA0CTL = TASSEL_2 | MC_3 | ID_2; 		// Source SMCLK pour TimerA, mode comptage UP/DOWN, prédivision de 4
 
-	P1SEL |= (BIT4); 				// selection fonction TA1.1 & TA1.2
-	P1SEL2 &= ~(BIT4); 				// selection fonction TA1.1 & TA1.2
+	DefinirFrequenceCliLED(FREQUENCE_ROBOT_AUTONOME); 	// Détermine la periode du signal
 
-	TA1CTL = (TASSEL_2 | MC_1 | ID_0); 		// source SMCLK pour TimerA , mode comptage Up
-	TA1CCTL1 = OUTMOD_7; 					// activation mode de sortie n°7
-	TA1CCR0 = 1500; 						// determine la periode du signal
-	TA1CCR1 = 1500;*/
+	TA0CTL |= TAIE;							// Activation interruption
 
 
-	TACTL = 0 | (TASSEL_2 | ID_0); //source SMCLK, pas de predivision ID_0
-	TACTL |= MC_1; //comptage en mode up
-	TACTL |= TAIE; //autorisation interruption TAIE
+	// Timer 1
+	TA1CTL = TASSEL_2 | MC_1 | ID_0; 		// Source SMCLK pour TimerA, mode comptage Up, pas de prédivision
 
-	DefinirFrequence(18); // Hz
+	TA1CCTL1 = OUTMOD_7; 					// Activation mode de sortie n°7
+	TA1CCTL2 = OUTMOD_7; 					// Activation mode de sortie n°7
 
-	__enable_interrupt();	// PWM
+	DefinirVitesseRoues(250);				// Détermine la periode du signal
+	TA1CCR1 = 0;							// Initialisation de la roue A
+	TA1CCR2 = 0;							// Initialisation de la roue B
+
+	TA1CTL |= TAIE;							// Activation interruption
+
 
 	return "OK";
 }
 
 
 
-
-void DefinirFrequence(unsigned int valeur)
+//************************************************************
+// Fonction DefinirFrequenceCliLED
+//
+//       Entrées :
+//                 unsigned int : défini la période du signal de la LED rouge
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void DefinirFrequenceCliLED(unsigned int frequence)
 {
-	TACCR0 = ((double)((double)1 / valeur) / 2) * 1000000;
+	TA0CCR0 = ((double)1 / frequence) / ((double)1 / 1000000 * 4 * 2);
+}
+
+
+
+//************************************************************
+// Fonction DefinirVitesseRoues
+//
+//       Entrées :
+//                 unsigned int : défini la période du signal des roues
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void DefinirVitesseRoues(unsigned int frequence)
+{
+	TA1CCR0 = ((double)1 / frequence) / ((double)1 / 1000000);
+}
+
+
+
+//************************************************************
+// Fonction IncrementerVitesseRoues
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void IncrementerVitesseRoues(void)
+{
+	if ((TA1CCR1 <= TA1CCR0) && (TA1CCR2 <= TA1CCR0)) {
+		TA1CCR1 += 100;
+		TA1CCR2 += 100;
+	}
 }

@@ -3,9 +3,9 @@
 
 
 
-char * 			InitSPI(void);
+char * 			InitSPI	(void);					// Initialisation du SPI
 
-unsigned char 	TXSPI(unsigned char donnee);
+unsigned char 	TXSPI	(unsigned char donnee);	// Transmission et réception d'un caractère
 
 
 

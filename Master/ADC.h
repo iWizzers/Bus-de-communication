@@ -1,12 +1,12 @@
+#ifndef ADC_H_
+#define ADC_H_
 
 
 
-void ADC_init(void);
+char * 	InitADC							(void);					// Initialisation du convertisseur analogique-numerique
+
+int 	ObtenirResultatConversionADC	(unsigned char voie);	// Permet de lire le résultat de la conversion analogique-numérique
 
 
 
-void ADC_Demarrer_conversion(unsigned char voie);
- 
-
-
-int ADC_Lire_resultat ();
+#endif /* ADC_H_ */

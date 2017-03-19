@@ -7,12 +7,12 @@
 
 
 
-void 	InitUART(void);
+void 	InitUART			(void);			// Initialisation du SPI
 
-void 	TXUART(char *chaine);
+void 	TXUART				(char *chaine);	// Transmission d'une chaine de caractères
 
-void 	DefinirReception(BOOL etat);
-BOOL 	ObtenirReception(void);
+void 	DefinirReception	(BOOL etat);	// Définition de l'état de la réception
+BOOL 	ObtenirReception	(void);			// Récupération de l'état de la réception
 
 
 

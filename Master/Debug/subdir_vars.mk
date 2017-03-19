@@ -10,6 +10,7 @@ C_SRCS += \
 ../ADC.c \
 ../GPIO.c \
 ../ISR.c \
+../Robot.c \
 ../SPI.c \
 ../Timer.c \
 ../UART.c \
@@ -19,6 +20,7 @@ OBJS += \
 ./ADC.obj \
 ./GPIO.obj \
 ./ISR.obj \
+./Robot.obj \
 ./SPI.obj \
 ./Timer.obj \
 ./UART.obj \
@@ -28,6 +30,7 @@ C_DEPS += \
 ./ADC.d \
 ./GPIO.d \
 ./ISR.d \
+./Robot.d \
 ./SPI.d \
 ./Timer.d \
 ./UART.d \
@@ -37,6 +40,7 @@ C_DEPS__QUOTED += \
 "ADC.d" \
 "GPIO.d" \
 "ISR.d" \
+"Robot.d" \
 "SPI.d" \
 "Timer.d" \
 "UART.d" \
@@ -46,6 +50,7 @@ OBJS__QUOTED += \
 "ADC.obj" \
 "GPIO.obj" \
 "ISR.obj" \
+"Robot.obj" \
 "SPI.obj" \
 "Timer.obj" \
 "UART.obj" \
@@ -55,6 +60,7 @@ C_SRCS__QUOTED += \
 "../ADC.c" \
 "../GPIO.c" \
 "../ISR.c" \
+"../Robot.c" \
 "../SPI.c" \
 "../Timer.c" \
 "../UART.c" \

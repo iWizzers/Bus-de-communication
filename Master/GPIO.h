@@ -7,10 +7,12 @@
 
 
 
-char * 	InitGPIO(void);
+char * 	InitGPIO				(void);							// Initialisation des entrées-sorties
 
-void 	ActiverGPIO(unsigned char bit, BOOL etat);
-BOOL	ObtenirEtatGPIO(unsigned char bit);
+void 	ActiverGPIOPort1		(unsigned char bit, BOOL etat);	// Activation du bit de sortie du port 1
+BOOL	ObtenirEtatGPIOPort1	(unsigned char bit);			// Récupération de l'état du bit de sortie du port 1
+void 	ActiverGPIOPort2		(unsigned char bit, BOOL etat);	// Activation du bit de sortie du port 2
+BOOL	ObtenirEtatGPIOPort2	(unsigned char bit);			// Récupération de l'état du bit de sortie du port 2
 
 
 

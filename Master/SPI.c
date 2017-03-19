@@ -1,32 +1,50 @@
+/* ============================================================================ */
+/* Description: Permet de gérer le SPI (transmission et réception)              */
+/*                                                                              */
+/* Auteurs: Mickaël  MERCIER                                                    */
+/*          Xingyong ZHAO                                                       */
+/* ============================================================================ */
+//********************************************************************************************
+//
+//                   MSP430G2553                                 MSP430G2231
+//                                   _______________________________________________
+//                 _______________  |                              _______________  |
+//		          |               | |                             |               | |
+//                |            GND|<-                             |            GND|<-
+//                |               |                 Chip Select ->|P1.1           |
+//  Chip Select <-|P1.4       P1.7|-> Data Out                    |           P1.7|<- Data In
+//    Clock Out <-|P1.5       P1.6|<- Data In          Clock In ->|P1.5       P1.6|-> Data Out
+//                |_______________|                               |_______________|
+//
+//********************************************************************************************
+
+
+
 #include <msp430g2553.h>
 #include "SPI.h"
-#include "GPIO.h"
 #include "global.h"
+#include "GPIO.h"
 
 
 
-unsigned char MST_Data, SLV_Data;
-
-
+//************************************************************
+// Fonction InitSPI
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 char * : chaine de caractère donnant l'état de l'initialisation
+//************************************************************
 char * InitSPI(void)
 {
-	P1DIR |= BIT4;
-	P1OUT |= BIT4;
-	P1SEL |= (BIT5 + BIT6 + BIT7);                 // P1.1 = RXD, P1.2=TXD
-	P1SEL2 |= (BIT5 + BIT6 + BIT7);                // P1.1 = RXD, P1.2=TXD
+	UCB0CTL0 = 0 | (UCMSB | UCMST);		// MSB en premier + SPI en maitre
+	UCB0CTL1 |= UCSSEL_2;				// SMCLK
 
-	UCB0CTL1 |= UCSSEL_2;
-	UCB0BR0 = 104;                          // 1MHz, 9600
-	UCB0BR1 = 0;                            // 1MHz, 9600
+	UCB0BR0 = 104;						// 1MHz, 9600
+	UCB0BR1 = 0;						// 1MHz, 9600
 
-	UCB0CTL0 = 0 | (UCMSB | UCMST);
-	UCB0CTL1 &= ~UCSWRST;                   // **Initialize USCI state machine**
-
-
-	P1OUT &= ~BIT4;                           // Now with SPI signals initialized,
-	P1OUT |= BIT4;                            // reset slave
-
-	__delay_cycles(75);                 // Wait for slave to initialize
+	UCB0CTL1 &= ~UCSWRST;				// **Initialize USCI state machine**
 
 
 	return "OK";
@@ -34,36 +52,41 @@ char * InitSPI(void)
 
 
 
+//************************************************************
+// Fonction TXSPI
+//
+//       Entrées :
+//                 unsigned char : caractère à envoyer
+//
+//       Sorties :
+//                 unsigned char : caractère reçu
+//************************************************************
 unsigned char TXSPI(unsigned char donnee)
 {
 	unsigned char retour;
 
 
-	ActiverGPIO(CS, false); //CS low
+	ActiverGPIOPort1(BIT_CS, false); 		// Sélection de l'esclave
 
 
-	while (!(IFG2 & UCB0TXIFG)) ;  				// USCI_A0 TX buffer ready? --wait flag
-	UCB0TXBUF = donnee;              				// TX -> RXed character
+	while (!(IFG2 & UCB0TXIFG)) ;  		// Attend que le buffer d'envoi soit libre
+	UCB0TXBUF = donnee;              	// Transmission du caractère
+	__delay_cycles(50);					// Délai pour l'esclave
 
 
-	__delay_cycles(50);
+	while (!(IFG2 & UCB0TXIFG)) ;  		// Attend que le buffer d'envoi soit libre
+	UCB0TXBUF = 0;              		// Transmission du caractère NULL
+	__delay_cycles(50);					// Délai pour l'esclave
 
 
-	/*while (!(IFG2 & UCB0TXIFG)) ;  				// USCI_A0 TX buffer ready? --wait flag
-	UCB0TXBUF = 0;              				// TX -> RXed character
+	while (!(IFG2 & UCB0RXIFG)) ; 		// Attend que le buffer de réception soit libre
+	retour = UCB0RXBUF;					// Lecture du caractère NULL
+
+	while (!(IFG2 & UCB0RXIFG)) ; 		// Attend que le buffer de réception soit libre
+	retour = UCB0RXBUF;					// Lecture du caractère à recevoir
 
 
-	__delay_cycles(50);                     // Add time between transmissions to make sure slave can keep up*/
-
-
-	while (!(IFG2 & UCB0RXIFG)) ; 				//receptionUSCI_A0 ? --wait flag
-	retour = UCB0RXBUF;
-
-
-	__delay_cycles(50);
-
-
-	ActiverGPIO(CS, true); //CS high
+	ActiverGPIOPort1(BIT_CS, true);			// Libération de l'esclave
 
 
 	return retour;
