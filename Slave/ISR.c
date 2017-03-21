@@ -9,6 +9,7 @@
 
 #include <msp430g2231.h>
 #include "SPI.h"
+#include "global.h"
 
 
 
@@ -27,13 +28,15 @@ __interrupt void USI_ISR(void)
 	unsigned char caractere = RXSPI();	// Réception du caractère
 
 	switch (caractere) {
-	case 'a':
-		P1OUT |= BIT0;		// Allumage de la LED
+	case 'j':
+		if (P1OUT & BIT_LED_ROUGE)
+			P1OUT &= ~BIT_LED_ROUGE;		// Allumage de la LED
+		else
+			P1OUT |= BIT_LED_ROUGE;
 		TXSPI('a');			// Envoi du caractère 'a'
 		break;
 	case 'e':
-		P1OUT &= ~BIT0;		// Extinction de la LED
-		TXSPI('e');			// Envoi du caractère 'e'
+		ArreterCommunicationSPI();
 		break;
 	default:
 		TXSPI('0');			// Envoi du caractère '0' = pas d'action

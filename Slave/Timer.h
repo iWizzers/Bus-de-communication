@@ -3,7 +3,9 @@
 
 
 
-void InitPWM(void);	// Initialisation du servomoteur
+void InitPWM				(void);	// Initialisation du servomoteur
+
+void Deplacement45Degres	(void);
 
 
 

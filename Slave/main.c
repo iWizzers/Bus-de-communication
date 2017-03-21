@@ -45,29 +45,11 @@ int main(void)
 
 
 	// Gestion du servomoteur
-	while (1) {
-		__delay_cycles(1000000); // Delai 1 seconde
-
-		/* Passage de X° à 0°
-		 *          ______________
-		 *         |   ________   |
-		 *         |  |        |  |
-		 *         X  | Servo  |  V -> 0°
-		 *            |________|
-		 */
-		TACCR1 = 500;
-
-		__delay_cycles(1000000); // Delai 1 seconde
-
-		/* Passage de X° à 180°
-		 *          ______________
-		 *         |   ________   |
-		 *         |  |        |  |
-		 * 180° <- V  | Servo  |  X
-		 *            |________|
-		 */
-		TACCR1 = 2500;	// 180°
+	while (ObtenirEtatCommunicationSPI() == true) {
+		Deplacement45Degres();
+		__delay_cycles(1000000);	// Delai 1 seconde
 	}
+
 
 	return 0;
 }

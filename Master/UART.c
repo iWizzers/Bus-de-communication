@@ -10,15 +10,17 @@
 #include <msp430g2553.h>
 #include "UART.h"
 #include "global.h"
+#include "Robot.h"
 
 
 
-BOOL reception = false;
+BOOL 	reception 			= false,
+		etatCommunication 	= true;
 
 
 
 //************************************************************
-// Fonction InitUART
+// Fonction InitUART : Initialisation du SPI
 //
 //       Entrées :
 //                 NULL
@@ -44,20 +46,21 @@ void InitUART(void)
 
 
 //************************************************************
-// Fonction TXUART
+// Fonction TXStringUART : Transmission d'une chaine de caractères
 //
 //       Entrées :
-//                 char * : chaine de caractère à transmettre
+//                 char * : chaine de caractères à transmettre
 //
 //       Sorties :
 //                 NULL
 //************************************************************
-void TXUART(char *chaine)
+void TXStringUART(char *chaine)
 {
 	int i,
 		nbOctetsALire = 0;
 
 
+	// Compte le nombre de caractère à envoyer
 	for (i = 0; chaine[i]; i++) {
 		nbOctetsALire++;
 	}
@@ -72,7 +75,24 @@ void TXUART(char *chaine)
 
 
 //************************************************************
-// Fonction DefinirReception
+// Fonction TXCharUART : Transmission d'une chaine de caractères
+//
+//       Entrées :
+//                 unsigned char : caractère à transmettre
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void TXCharUART(unsigned char carac)
+{
+	while (!(IFG2 & UCA0TXIFG)) ;	// Attend que le buffer de transmission soit libre
+	UCA0TXBUF = carac;       		// Transmission du caractère
+}
+
+
+
+//************************************************************
+// Fonction DefinirReceptionUART : Définition de l'état de la réception
 //
 //       Entrées :
 //                 BOOL : permet de définir l'état de l'UART
@@ -80,7 +100,7 @@ void TXUART(char *chaine)
 //       Sorties :
 //                 NULL
 //************************************************************
-void DefinirReception(BOOL etat)
+void DefinirReceptionUART(BOOL etat)
 {
 	reception = etat;
 }
@@ -88,7 +108,7 @@ void DefinirReception(BOOL etat)
 
 
 //************************************************************
-// Fonction DefinirReception
+// Fonction ObtenirReceptionUART : Récupération de l'état de la réception
 //
 //       Entrées :
 //                 NULL
@@ -96,7 +116,56 @@ void DefinirReception(BOOL etat)
 //       Sorties :
 //                 BOOL : permet de récupérer l'état de l'UART
 //************************************************************
-BOOL ObtenirReception(void)
+BOOL ObtenirReceptionUART(void)
 {
 	return reception;
+}
+
+
+
+//************************************************************
+// Fonction ArreterCommunicationUART : Permet d'arrêter la communication UART
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void ArreterCommunicationUART(void)
+{
+	etatCommunication = false;
+
+	// Désactivation de l'interruption UART
+	IE2 &= ~UCA0RXIE;
+
+
+	// Arrêt du robot
+	while (ObtenirEtatRobot() != ARRET) {
+		__delay_cycles(25000);
+		Stop(ARRET);
+	}
+
+	// Désactivation de l'interruption des timers
+	TA0CTL &= ~TAIE;
+	TA1CTL &= ~TAIE;
+
+	// Allumage LED rouge pour signifier la fin du programme
+	P1OUT = 0 | BIT_LED_ROUGE;
+}
+
+
+
+//************************************************************
+// Fonction ObtenirEtatCommunicationUART : Permet de récupérer l'état de la communication UART
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 BOOL : retourne l'état de la communication
+//************************************************************
+BOOL ObtenirEtatCommunicationUART(void)
+{
+	return etatCommunication;
 }

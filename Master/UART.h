@@ -7,12 +7,16 @@
 
 
 
-void 	InitUART			(void);			// Initialisation du SPI
+void 	InitUART						(void);					// Initialisation du SPI
 
-void 	TXUART				(char *chaine);	// Transmission d'une chaine de caractères
+void 	TXStringUART					(char *chaine);			// Transmission d'une chaine de caractères
+void 	TXCharUART						(unsigned char carac);	// Transmission d'un caractère
 
-void 	DefinirReception	(BOOL etat);	// Définition de l'état de la réception
-BOOL 	ObtenirReception	(void);			// Récupération de l'état de la réception
+void 	DefinirReceptionUART			(BOOL etat);			// Définition de l'état de la réception
+BOOL 	ObtenirReceptionUART			(void);					// Récupération de l'état de la réception
+
+void 	ArreterCommunicationUART		(void);					// Permet d'arrêter la communication UART
+BOOL 	ObtenirEtatCommunicationUART	(void);					// Permet de récupérer l'état de la communication UART
 
 
 

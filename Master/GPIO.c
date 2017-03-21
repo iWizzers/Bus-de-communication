@@ -14,7 +14,7 @@
 
 
 //************************************************************
-// Fonction InitGPIO
+// Fonction InitGPIO : Initialisation des entrées-sorties
 //
 //       Entrées :
 //                 NULL
@@ -60,7 +60,7 @@ char * InitGPIO(void)
 
 
 //************************************************************
-// Fonction ActiverGPIOPort1
+// Fonction ActiverGPIOPort1 : Activation du bit de sortie du port 1
 //
 //       Entrées :
 //                 unsigned char : bit à modifier
@@ -72,16 +72,16 @@ char * InitGPIO(void)
 void ActiverGPIOPort1(unsigned char bit, BOOL etat)
 {
 	if (etat == true) {
-		P1OUT |= bit;
+		P1OUT |= bit;	// On active le bit de sortie
 	} else {
-		P1OUT &= ~bit;
+		P1OUT &= ~bit;	// On désactive le bit de sortie
 	}
 }
 
 
 
 //************************************************************
-// Fonction ObtenirEtatGPIOPort1
+// Fonction ObtenirEtatGPIOPort1 : Récupération de l'état du bit de sortie du port 1
 //
 //       Entrées :
 //                 unsigned char : bit dont on veut connaitre l'état
@@ -94,10 +94,10 @@ BOOL ObtenirEtatGPIOPort1(unsigned char bit)
 	BOOL ret;
 
 
-	if (P1OUT & bit) {
-		ret = true;
-	} else {
-		ret = false;
+	if (P1OUT & bit) {	// Si le bit de sortie est actif
+		ret = true;		// On renvoie true
+	} else {			// Sinon
+		ret = false;	// On renvoie false
 	}
 
 
@@ -107,7 +107,7 @@ BOOL ObtenirEtatGPIOPort1(unsigned char bit)
 
 
 //************************************************************
-// Fonction ActiverGPIOPort2
+// Fonction ActiverGPIOPort2 : Activation du bit de sortie du port 2
 //
 //       Entrées :
 //                 unsigned char : bit à modifier
@@ -119,16 +119,16 @@ BOOL ObtenirEtatGPIOPort1(unsigned char bit)
 void ActiverGPIOPort2(unsigned char bit, BOOL etat)
 {
 	if (etat == true) {
-		P2OUT |= bit;
+		P2OUT |= bit;	// On active le bit de sortie
 	} else {
-		P2OUT &= ~bit;
+		P2OUT &= ~bit;	// On désactive le bit de sortie
 	}
 }
 
 
 
 //************************************************************
-// Fonction ObtenirEtatGPIOPort2
+// Fonction ObtenirEtatGPIOPort2 : Récupération de l'état du bit de sortie du port 2
 //
 //       Entrées :
 //                 unsigned char : bit dont on veut connaitre l'état
@@ -141,10 +141,10 @@ BOOL ObtenirEtatGPIOPort2(unsigned char bit)
 	BOOL ret;
 
 
-	if (P2OUT & bit) {
-		ret = true;
-	} else {
-		ret = false;
+	if (P2OUT & bit) {	// Si le bit de sortie est actif
+		ret = true;		// On renvoie true
+	} else {			// Sinon
+		ret = false;	// On renvoie false
 	}
 
 

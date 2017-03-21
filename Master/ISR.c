@@ -18,8 +18,7 @@
 
 
 
-unsigned int 	frequence = 0,
-				menu = MENU_PRINCIPAL;
+unsigned int 	menu = MENU_PRINCIPAL;
 unsigned char 	nbIncrementRoueA = 0,
 				nbIncrementRoueB = 0;
 
@@ -44,79 +43,54 @@ __interrupt void USCI0RX_ISR(void)
     	DefinirModeRobot(MANUEL);
     } else {
     	if (menu == MENU_PARAMETRE_FREQ_CLI_LED) {	// Si nous modifions la PWM
-			if ((c >= '0') && (c <= '9')) {			// Si le caractère est numérique (de 0 à 9)
-				if (frequence < 32767) {
-					frequence = frequence * 10 + ((int)c & 0x0F);
-
-					if (frequence > 32767) {
-						frequence = 32767;
-						TXUART("\rVeuillez saisir une frequence (Hz) : 32767");
-					} else {
-						while (!(IFG2&UCA0TXIFG)) ;
-						UCA0TXBUF = c;
-					}
-				}
-			} else if ((int)c == 127) {				// Si le caractère est 'supprimer'
-				if (frequence > 0) {
-					frequence = frequence / 10;
-
-					while (!(IFG2&UCA0TXIFG)) ;
-					UCA0TXBUF = c;
-				}
-			} else if ((int)c == 13) {				// Si le caractère est 'entrée'
-				DefinirVitesseRoues(frequence);
-				TXUART(	"\n\nNouvelle frequence definie"
-						"\n\n_______________________________\n\n\n");
-				frequence = 0;
-				menu = MENU_PRINCIPAL;
-				DefinirReception(true);
-			}
-		} else {
+    		if (ModifierFrequenceRoues(c) == true) {
+    			menu = MENU_PRINCIPAL;
+				DefinirReceptionUART(true);
+    		}
+		} else {									// Sinon
 			switch (c) {
 			case 'h':	// Affichage de l'aide
-				// Affichage du caractère reçu sur le terminal
-				while (!(IFG2 & UCA0TXIFG)) ;
-				UCA0TXBUF = c;
+				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
-				TXUART(	"\n\n====== AIDE MENU PRINCIPAL ======\n"
-						"[h] - Aide\n"
-						"[e] - Eteindre\n"
-						"[a] - Passage en mode autonome\n"
-						"[p] - Modifier la vitesse maximale\n"
-						"[z] - Avancer\n"
-						"[q] - Tourner a gauche\n"
-						"[s] - Reculer\n"
-						"[d] - Tourner a droite"
-						"\n\n_______________________________\n\n\n");
+				TXStringUART(	"\n\n====== AIDE MENU PRINCIPAL ======\n"
+								"[h] - Aide\n"
+								"[e] - Eteindre\n"
+								"[a] - Passage en mode autonome\n"
+								"[p] - Modifier la vitesse maximale\n"
+								"[z] - Avancer\n"
+								"[q] - Tourner a gauche\n"
+								"[s] - Reculer\n"
+								"[d] - Tourner a droite"
+								"\n\n_______________________________\n\n\n");
+
+				DefinirReceptionUART(true);
 				break;
 			case 'e':	// Exctinction de la communication
-				// Affichage du caractère reçu sur le terminal
-				while (!(IFG2 & UCA0TXIFG)) ;
-				UCA0TXBUF = c;
+				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
-				TXUART(	"\n\nExtinction de la communication"
-						"\n\n_______________________________\n\n\n");
+				TXStringUART(	"\n\nExtinction de la communication"
+								"\n\n_______________________________\n\n\n");
 
-				// Désactivation de l'interruption UART
-				IE2 &= ~UCA0RXIE;
+				ArreterCommunicationUART();
+				ArreterCommunicationSPI(c);
+
+				DefinirReceptionUART(true);
 				break;
 			case 'a':
-				// Affichage du caractère reçu sur le terminal
-				while (!(IFG2 & UCA0TXIFG)) ;
-				UCA0TXBUF = c;
+				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
-				TXUART(	"\n\nPassage en mode autonome"
-						"\n\n_______________________________\n\n\n");
+				TXStringUART(	"\n\nPassage en mode autonome"
+								"\n\n_______________________________\n\n\n");
 
 				DefinirModeRobot(AUTONOME);
+
+				DefinirReceptionUART(true);
 				break;
 			case 'p':	// Réglage de la PWM
-				// Affichage du caractère reçu sur le terminal
-				while (!(IFG2 & UCA0TXIFG)) ;
-				UCA0TXBUF = c;
+				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
-				TXUART(	"\n\nModifier la vitesse maximale"
-						"\n\n_______________________________\n\n\n");
+				TXStringUART(	"\n\nModifier la vitesse maximale"
+								"\n\nVeuillez saisir une frequence (Hz) : ");
 
 				menu = MENU_PARAMETRE_FREQ_CLI_LED;
 				break;
@@ -133,31 +107,27 @@ __interrupt void USCI0RX_ISR(void)
 				TournerDroite();
 				break;
 			default:	// Touche inconnue
-				// Affichage du caractère reçu sur le terminal
-				while (!(IFG2 & UCA0TXIFG)) ;
-				UCA0TXBUF = c;
+				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
-				TXUART(	"\n\nTouche non reconnue\n"
-						"Saisir 'h' pour afficher l'aide");
+				TXStringUART(	"\n\nTouche non reconnue\n"
+								"Saisir 'h' pour afficher l'aide"
+								"\n\n_______________________________\n\n\n");
 
-				TXUART("\n\n_______________________________\n\n\n");
+
+				// Envoi SPI
+				TXStringUART("\n\nSPI envoye : ");
+				TXCharUART(c);
+
+				// Réception SPI
+				unsigned char var = TXSPI(c);
+				TXStringUART("\n\nSPI recu : ");
+				TXCharUART(var);
+				TXStringUART("\n\n");
+
+
+				DefinirReceptionUART(true);
 				break;
 			}
-
-
-			// Envoi SPI
-			TXUART("\n\nSPI envoye : ");
-			while (!(IFG2 & UCA0TXIFG)) ;
-			UCA0TXBUF = c;
-
-			// Réception SPI
-			unsigned char var = TXSPI(c);
-			TXUART("\n\nSPI recu : ");
-			while (!(IFG2 & UCA0TXIFG)) ;
-			UCA0TXBUF = var;
-
-
-			DefinirReception(true);
 		}
     }
 }
@@ -180,13 +150,6 @@ __interrupt void Timer0Interrupt(void)
 		ActiverGPIOPort1(BIT_LED_ROUGE, false);
 	} else {
 		ActiverGPIOPort1(BIT_LED_ROUGE, true);
-	}
-
-
-	if (ObtenirModeRobot() == AUTONOME) {
-		DefinirFrequenceCliLED(FREQUENCE_ROBOT_AUTONOME);
-	} else {
-		DefinirFrequenceCliLED(FREQUENCE_ROBOT_MANUEL);
 	}
 
 

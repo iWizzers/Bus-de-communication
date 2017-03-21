@@ -1,7 +1,8 @@
 /* ============================================================================ */
-/* Description: A l'aide du MSP430G2231, il est possible d'effectuer une        */
-/* communication SPI. De plus, un servomoteur effectue une rotation de 180°     */
-/* afin qu'un capteur puisse détecter un obstacle.                              */
+/* Description: A l'aide du MSP430G2553, nous pouvons gérer une communication   */
+/* UART en plus d'une communication SPI. Selon le caractère envoyé (sur l'UART) */
+/* nous gérons l'état d'avancement du robot. De plus, un capteur est présent    */
+/* afin de ralentir à la vue d'un obstacle voire s'arrêter.                     */
 /*                                                                              */
 /* Auteurs: Mickaël  MERCIER                                                    */
 /*          Xingyong ZHAO                                                       */
@@ -17,8 +18,7 @@
 #include "Timer.h"
 #include "ADC.h"
 #include "Robot.h"
-// Génération nombre aléatoire
-#include <stdlib.h>
+#include <stdlib.h>	// Génération nombre aléatoire
 
 
 
@@ -52,18 +52,18 @@ int main(void)
 
 
     // INITIALISATION
-    InitGPIO();		// Entrées-sorties
-    InitUART();		// UART
+    InitGPIO();			// Entrées-sorties
+    InitUART();			// UART
 
 
-    TXUART("====== Initialisation ======");
-	TXUART("\nPWM ...");
-	TXUART(InitPWM());		// PWM des roues
-    TXUART("\nSPI ...");
-    TXUART(InitSPI());		// SPI en master
-    TXUART("\nADC ...");
-    TXUART(InitADC());		// Conversion analogique-numérique
-    TXUART("\n====== Fin initialisation ======\n\n\n");
+    TXStringUART("====== Initialisation ======");
+	TXStringUART("\nPWM ...");
+	TXStringUART(InitPWM());		// PWM
+    TXStringUART("\nSPI ...");
+    TXStringUART(InitSPI());		// SPI en master
+    TXStringUART("\nADC ...");
+    TXStringUART(InitADC());		// Conversion analogique-numérique
+    TXStringUART("\n====== Fin initialisation ======\n\n\n");
 
 
     // Exctinction de la LED rouge si l'initialisation est un succès
@@ -74,74 +74,61 @@ int main(void)
     __enable_interrupt();
 
 
-    TXUART("====== Bienvenue dans la gestion du LaunchPad ! ======\n\n\n"
+    TXStringUART("====== Bienvenue dans la gestion du LaunchPad ! ======\n\n\n"
     		"> MENU PRINCIPAL <\n\n\n");
 
 
 
     // Tant que l'interruption de l'UART est active
-    while (IE2 == UCA0RXIE) {
-    	while (ObtenirModeRobot() == AUTONOME) {
-    		etatRobotAleatoire = GenererNombre(0, 4);
+    while (ObtenirEtatCommunicationUART() == true) {
+    	while (ObtenirModeRobot() == AUTONOME) {			// Boucle tant que le robot est en mode autonome
+    		etatRobotAleatoire = GenererNombre(0, 4);		// Génération d'un nombre aléatoire entre 0 et 4
 
-    		delai = GenererNombre(40, 600);
+    		delai = GenererNombre(50, 500);					// Génération d'un délai entre 1 seconde (50) et 10 secondes (500)
 
-    		for (i = 0; i < delai; i++) {
-    			if (ObtenirModeRobot() == AUTONOME) {
-    				switch (etatRobotAleatoire) {
-					case AVANCE:
+    		for (i = 0; i < delai; i++) {					// Boucle en fonction du délai
+    			if (ObtenirModeRobot() == AUTONOME) {		// Si le robot est en mode autonome
+    				switch (etatRobotAleatoire) {			// En fonction du nombre généré...
+					case AVANCE:							// ...il avance
 						Avancer();
 						break;
-					case RECULE:
+					case RECULE:							// ...il recule
 						Reculer();
 						break;
-					case TOURNE_DROITE:
+					case TOURNE_DROITE:						// ...il tourne à droite
 						TournerDroite();
 						break;
-					case TOURNE_GAUCHE:
+					case TOURNE_GAUCHE:						// ...il tourne à gauche
 						TournerGauche();
 						break;
-					default:
-						Stop(ARRET);
+					default:								// ...il s'arrête
+						if (ObtenirEtatRobot() != ARRET) {	// Si le robot n'est pas arrêté
+							Stop(ARRET);					// Ralenti le robot
+						}
 						break;
 					}
 
-					__delay_cycles(25000);
-    			} else {
-    				break;
+					__delay_cycles(20000);					// Délai = 50 Hz
+    			} else {									// Sinon le robot est en mode manuel
+    				break;									// Sort de la boucle du délai
     			}
     		}
     	}
 
 
-    	TXUART("(MSP430G2553) ");
+    	TXStringUART("\r(MSP430G2553) ");
 
     	// Attend la réception d'un caractère
-    	while (ObtenirReception() == false) {
-    		if (ObtenirEtatRobot() != ARRET) {
-				__delay_cycles(20000);
-				Stop(ARRET);
+    	while (ObtenirReceptionUART() == false) {
+    		if (ObtenirEtatRobot() != ARRET) {	// Si le robot n'est pas arrêté
+				__delay_cycles(20000);			// Délai = 50 Hz
+				Stop(ARRET);					// Ralenti le robot
     		}
     	}
 
-    	TXUART("\n\n_______________________________\n\n\n");
 
-    	DefinirReception(false);
+    	DefinirReceptionUART(false);
     }
-
-
-	// Arrêt du robot
-	while (ObtenirEtatRobot() != ARRET) {
-		__delay_cycles(25000);
-		Stop(ARRET);
-	}
-
-	// Désactivation de l'interruption des timers
-	TA0CTL &= ~TAIE;
-	TA1CTL &= ~TAIE;
-
-    // Allumage LED rouge pour signifier la fin du programme
-    P1OUT = 0 | BIT_LED_ROUGE;
 
 
     return 0;
@@ -150,7 +137,8 @@ int main(void)
 
 
 //************************************************************
-// Fonction GenererNombre
+// Fonction GenererNombre : Permet de générer un nombre aléatoire
+//                          entre deux bornes
 //
 //       Entrées :
 //                 int : nombre minimum
@@ -161,5 +149,5 @@ int main(void)
 //************************************************************
 int GenererNombre(int min, int max)
 {
-    return (rand() / (double)RAND_MAX ) * (max - min) + min;
+    return rand() % (max - min) + min;
 }

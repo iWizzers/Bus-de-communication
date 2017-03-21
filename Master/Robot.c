@@ -24,7 +24,7 @@ BOOL 			messageEnvoye = false;
 
 
 //************************************************************
-// Fonction DefinirModeRobot
+// Fonction DefinirModeRobot : Permet de définir le mode de fonctionnement du robot
 //
 //       Entrées :
 //                 unsigned char : mode de fonctionnement du robot
@@ -40,7 +40,7 @@ void DefinirModeRobot(unsigned char mode)
 
 
 //************************************************************
-// Fonction ObtenirModeRobot
+// Fonction ObtenirModeRobot : Permet de récupérer le mode de fonctionnement du robot
 //
 //       Entrées :
 //                 NULL
@@ -56,7 +56,7 @@ unsigned char ObtenirModeRobot(void)
 
 
 //************************************************************
-// Fonction ObtenirEtatRobot
+// Fonction ObtenirEtatRobot : Permet de récupérer l'état du robot
 //
 //       Entrées :
 //                 NULL
@@ -72,7 +72,7 @@ unsigned char ObtenirEtatRobot(void)
 
 
 //************************************************************
-// Fonction Avancer
+// Fonction Avancer : Permet de faire avancer le robot
 //
 //       Entrées :
 //                 NULL
@@ -87,7 +87,7 @@ void Avancer(void)
 	} else {
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
-			TXUART("LE ROBOT AVANCE\n");
+			TXStringUART("LE ROBOT AVANCE\n");
 		}
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, true);
@@ -108,7 +108,7 @@ void Avancer(void)
 
 
 //************************************************************
-// Fonction Reculer
+// Fonction Reculer : Permet de faire reculer le robot
 //
 //       Entrées :
 //                 NULL
@@ -123,7 +123,7 @@ void Reculer(void)
 	} else {
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
-			TXUART("LE ROBOT RECULE\n");
+			TXStringUART("LE ROBOT RECULE\n");
 		}
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, false);
@@ -136,7 +136,7 @@ void Reculer(void)
 
 
 //************************************************************
-// Fonction TournerDroite
+// Fonction TournerDroite : Permet de faire tourner le robot à droite
 //
 //       Entrées :
 //                 NULL
@@ -151,7 +151,7 @@ void TournerDroite(void)
 	} else {
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
-			TXUART("LE ROBOT TOURNE A DROITE\n");
+			TXStringUART("LE ROBOT TOURNE A DROITE\n");
 		}
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, true);
@@ -164,7 +164,7 @@ void TournerDroite(void)
 
 
 //************************************************************
-// Fonction TournerGauche
+// Fonction TournerGauche : Permet de faire tourner le robot à gauche
 //
 //       Entrées :
 //                 NULL
@@ -179,7 +179,7 @@ void TournerGauche(void)
 	} else {
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
-			TXUART("LE ROBOT TOURNE A GAUCHE\n");
+			TXStringUART("LE ROBOT TOURNE A GAUCHE\n");
 		}
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, false);
@@ -192,7 +192,7 @@ void TournerGauche(void)
 
 
 //************************************************************
-// Fonction Stop
+// Fonction Stop : Permet de ralentir puis de stopper le robot
 //
 //       Entrées :
 //                 unsigned char : si le robot est arrêté, il prend l'état donné
@@ -204,28 +204,24 @@ void Stop(unsigned char etat)
 {
 	if (messageEnvoye == false) {
 		messageEnvoye = true;
-		TXUART("ARRET DU ROBOT\n");
+		TXStringUART("ARRET DU ROBOT\n");
 	}
 
-	if (TA1CCR1 > 100) {
-		TA1CCR1 -= 100;
-	}
 
-	if (TA1CCR2 > 100) {
-		TA1CCR2 -= 100;
-	}
-
-	if ((TA1CCR1 <= 100) && (TA1CCR2 <= 100)) {
+	if (DecrementerVitesseRoues() == true) {
 		etatRobot = etat;
-		TA1CCR1 = TA1CCR2 = 0;
 		messageEnvoye = false;
+
+		if (etat == ARRET) {
+			DefinirReceptionUART(true);
+		}
 	}
 }
 
 
 
 //************************************************************
-// Fonction ArretUrgence
+// Fonction ArretUrgence : Permet de stopper net le robot
 //
 //       Entrées :
 //                 NULL

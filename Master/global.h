@@ -9,10 +9,12 @@
 
 
 
-// Définition de la fréquence de l'allumage de la LED rouge
-// afin de vérifier l'état du robot
-#define FREQUENCE_ROBOT_AUTONOME	1	// Hz
-#define FREQUENCE_ROBOT_MANUEL		20	// Hz
+// Définition des fréquences min et max afin de vérifier l'état du robot par le biais de la LED rouge
+#define FREQUENCE_MIN_LED_ROBOT		1		// Hz
+#define FREQUENCE_MAX_LED_ROBOT		50		// Hz
+
+#define FREQUENCE_MIN_ROUES_ROBOT 	200		// Hz
+#define FREQUENCE_MAX_ROUES_ROBOT 	250000	// Hz
 
 
 

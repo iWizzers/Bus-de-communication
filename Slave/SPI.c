@@ -22,6 +22,11 @@
 
 #include <msp430g2231.h>
 #include "SPI.h"
+#include "global.h"
+
+
+
+BOOL 	etatCommunication 	= true;
 
 
 
@@ -75,4 +80,45 @@ unsigned char RXSPI(void){
 	while((USIIFG & USICTL1) != BIT0); // Scrutation
 
 	return USISRL;
+}
+
+
+
+//************************************************************
+// Fonction ArreterCommunicationSPI : Permet d'arrêter la communication SPI
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void ArreterCommunicationSPI(void)
+{
+	etatCommunication = false;
+
+	// Désactivation de l'interruption SPI
+	USICTL1 &= ~USIIE;
+
+	// Désactivation du servomoteur
+	P1DIR &= ~BIT_SERVOMOTEUR;
+
+	// Allumage LED rouge pour signifier la fin du programme
+	P1OUT = 0 | BIT_LED_ROUGE;
+}
+
+
+
+//************************************************************
+// Fonction ObtenirEtatCommunicationSPI : Permet de récupérer l'état de la communication SPI
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 BOOL : retourne l'état de la communication
+//************************************************************
+BOOL ObtenirEtatCommunicationSPI(void)
+{
+	return etatCommunication;
 }

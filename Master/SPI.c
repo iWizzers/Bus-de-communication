@@ -28,7 +28,7 @@
 
 
 //************************************************************
-// Fonction InitSPI
+// Fonction InitSPI : Initialisation du SPI
 //
 //       Entrées :
 //                 NULL
@@ -53,7 +53,7 @@ char * InitSPI(void)
 
 
 //************************************************************
-// Fonction TXSPI
+// Fonction TXSPI : Transmission et réception d'un caractère
 //
 //       Entrées :
 //                 unsigned char : caractère à envoyer
@@ -66,7 +66,7 @@ unsigned char TXSPI(unsigned char donnee)
 	unsigned char retour;
 
 
-	ActiverGPIOPort1(BIT_CS, false); 		// Sélection de l'esclave
+	ActiverGPIOPort1(BIT_CS, false); 	// Sélection de l'esclave
 
 
 	while (!(IFG2 & UCB0TXIFG)) ;  		// Attend que le buffer d'envoi soit libre
@@ -86,8 +86,24 @@ unsigned char TXSPI(unsigned char donnee)
 	retour = UCB0RXBUF;					// Lecture du caractère à recevoir
 
 
-	ActiverGPIOPort1(BIT_CS, true);			// Libération de l'esclave
+	ActiverGPIOPort1(BIT_CS, true);		// Libération de l'esclave
 
 
 	return retour;
+}
+
+
+
+//************************************************************
+// Fonction ArreterCommunicationSPI : Permet d'arrêter la communication SPI
+//
+//       Entrées :
+//                 unsigned char : caractère à transmettre
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void ArreterCommunicationSPI(unsigned char caractere)
+{
+	TXSPI(caractere);
 }
