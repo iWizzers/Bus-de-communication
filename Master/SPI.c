@@ -59,13 +59,10 @@ char * InitSPI(void)
 //                 unsigned char : caractère à envoyer
 //
 //       Sorties :
-//                 unsigned char : caractère reçu
+//                 NULL
 //************************************************************
-unsigned char TXSPI(unsigned char donnee)
+void TXSPI(unsigned char donnee)
 {
-	unsigned char retour;
-
-
 	ActiverGPIOPort1(BIT_CS, false); 	// Sélection de l'esclave
 
 
@@ -77,6 +74,22 @@ unsigned char TXSPI(unsigned char donnee)
 	while (!(IFG2 & UCB0TXIFG)) ;  		// Attend que le buffer d'envoi soit libre
 	UCB0TXBUF = 0;              		// Transmission du caractère NULL
 	__delay_cycles(50);					// Délai pour l'esclave
+}
+
+
+
+//************************************************************
+// Fonction TXSPI : Transmission et réception d'un caractère
+//
+//       Entrées :
+//                 NULL
+//
+//       Sorties :
+//                 unsigned char : caractère reçu
+//************************************************************
+unsigned char RXSPI(void)
+{
+	unsigned char retour;
 
 
 	while (!(IFG2 & UCB0RXIFG)) ; 		// Attend que le buffer de réception soit libre

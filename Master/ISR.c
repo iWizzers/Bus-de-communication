@@ -82,6 +82,7 @@ __interrupt void USCI0RX_ISR(void)
 				TXStringUART(	"\n\nPassage en mode autonome"
 								"\n\n_______________________________\n\n\n");
 
+				TXSPI('z');	// Initialisation du capteur à 90°
 				DefinirModeRobot(AUTONOME);
 
 				DefinirReceptionUART(true);
@@ -112,17 +113,6 @@ __interrupt void USCI0RX_ISR(void)
 				TXStringUART(	"\n\nTouche non reconnue\n"
 								"Saisir 'h' pour afficher l'aide"
 								"\n\n_______________________________\n\n\n");
-
-
-				// Envoi SPI
-				TXStringUART("\n\nSPI envoye : ");
-				TXCharUART(c);
-
-				// Réception SPI
-				unsigned char var = TXSPI(c);
-				TXStringUART("\n\nSPI recu : ");
-				TXCharUART(var);
-				TXStringUART("\n\n");
 
 
 				DefinirReceptionUART(true);
@@ -170,11 +160,8 @@ __interrupt void Timer0Interrupt(void)
 #pragma vector=TIMER1_A1_VECTOR
 __interrupt void Timer1Interrupt(void)
 {
-	/*if ((nbIncrementRoueA == 15) || (nbIncrementRoueB == 15)) {
-		if (nbIncrementRoueA > nbIncrementRoueB)
-			TA1CCR1 += nbIncrementRoueA - nbIncrementRoueB;
-		else if (nbIncrementRoueA < nbIncrementRoueB)
-			TA1CCR2 += nbIncrementRoueB - nbIncrementRoueA;
+	if ((nbIncrementRoueA == 15) || (nbIncrementRoueB == 15)) {
+		CorrigerErreurRoues(nbIncrementRoueA, nbIncrementRoueB);
 
 		nbIncrementRoueA = nbIncrementRoueB = 0;
 	} else {
@@ -183,7 +170,7 @@ __interrupt void Timer1Interrupt(void)
 
 		if (P2IN & BIT_OPTO_COUPLEUR_ROUE_B)
 			nbIncrementRoueB++;
-	}*/
+	}
 
 	TA1CTL &= ~TAIFG; //RAZ TAIFG
 }

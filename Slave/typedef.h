@@ -11,12 +11,4 @@ typedef enum
 
 
 
-typedef enum
-{
-	horaire = 0,
-	antiHoraire = 1
-} ROTATION;
-
-
-
 #endif /* TYPEDEF_H_ */

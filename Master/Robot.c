@@ -14,6 +14,7 @@
 #include "GPIO.h"
 #include "ADC.h"
 #include "UART.h"
+#include "SPI.h"
 
 
 
@@ -82,23 +83,85 @@ unsigned char ObtenirEtatRobot(void)
 //************************************************************
 void Avancer(void)
 {
+	unsigned int distanceObstacle = ObtenirResultatConversionADC(3);
+	unsigned int tableObstacle[5] = {0, 0, 0, 0, 0};
+	int i;
+
+
 	if (ObtenirEtatRobot() != AVANCE) {
 		Stop(AVANCE);
 	} else {
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
 			TXStringUART("LE ROBOT AVANCE\n");
+		} else {
+			// Ne fait rien
 		}
+
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, true);
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_B, true);
 
-		unsigned int distanceObstacle = ObtenirResultatConversionADC(3);
+
+		distanceObstacle = ObtenirResultatConversionADC(3);
+
 
 		if (DISTANCE_MIN_OBSTACLE <= distanceObstacle) {
 			ArretUrgence();
 		} else if (DISTANCE_MAX_OBSTACLE <= distanceObstacle) {
-			Stop(AVANCE);
+			if (ObtenirModeRobot() == AUTONOME) {
+				ArretUrgence();
+
+
+				TXSPI('i');
+				RXSPI();
+
+				__delay_cycles(500000);
+
+				tableObstacle[0] = ObtenirResultatConversionADC(3);
+
+
+				for (i = 1; i < 5; i++) {
+					TXSPI('s');
+					RXSPI();
+
+					__delay_cycles(500000);
+
+					tableObstacle[i] = ObtenirResultatConversionADC(3);
+				}
+
+
+				TXSPI('z');
+				RXSPI();
+
+
+				if (DISTANCE_MAX_OBSTACLE >= tableObstacle[0]) {
+					ActiverGPIOPort2(BIT_SENS_MOTEUR_A, false);
+					ActiverGPIOPort2(BIT_SENS_MOTEUR_B, true);
+
+					TA1CCR1 = TA1CCR2 = TA1CCR0 / 2;
+
+					__delay_cycles(800000);
+				} else if (DISTANCE_MAX_OBSTACLE >= tableObstacle[2]) {
+					IncrementerVitesseRoues();
+				} else if (DISTANCE_MAX_OBSTACLE >= tableObstacle[4]) {
+					ActiverGPIOPort2(BIT_SENS_MOTEUR_A, true);
+					ActiverGPIOPort2(BIT_SENS_MOTEUR_B, false);
+
+					TA1CCR1 = TA1CCR2 = TA1CCR0 / 2;
+
+					__delay_cycles(800000);
+				} else {
+					ActiverGPIOPort2(BIT_SENS_MOTEUR_A, false);
+					ActiverGPIOPort2(BIT_SENS_MOTEUR_B, true);
+
+					TA1CCR1 = TA1CCR2 = TA1CCR0 / 2;
+
+					__delay_cycles(1500000);
+				}
+			} else {
+				Stop(AVANCE);
+			}
 		} else {
 			IncrementerVitesseRoues();
 		}
@@ -124,6 +187,8 @@ void Reculer(void)
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
 			TXStringUART("LE ROBOT RECULE\n");
+		} else {
+			// Ne fait rien
 		}
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, false);
@@ -152,6 +217,8 @@ void TournerDroite(void)
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
 			TXStringUART("LE ROBOT TOURNE A DROITE\n");
+		} else {
+			// Ne fait rien
 		}
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, true);
@@ -180,6 +247,8 @@ void TournerGauche(void)
 		if (messageEnvoye == false) {
 			messageEnvoye = true;
 			TXStringUART("LE ROBOT TOURNE A GAUCHE\n");
+		} else {
+			// Ne fait rien
 		}
 
 		ActiverGPIOPort2(BIT_SENS_MOTEUR_A, false);
@@ -205,6 +274,8 @@ void Stop(unsigned char etat)
 	if (messageEnvoye == false) {
 		messageEnvoye = true;
 		TXStringUART("ARRET DU ROBOT\n");
+	} else {
+		// Ne fait rien
 	}
 
 
@@ -214,7 +285,11 @@ void Stop(unsigned char etat)
 
 		if (etat == ARRET) {
 			DefinirReceptionUART(true);
+		} else {
+			// Ne fait rien
 		}
+	} else {
+		// Ne fait rien
 	}
 }
 
@@ -232,4 +307,5 @@ void Stop(unsigned char etat)
 void ArretUrgence(void)
 {
 	TA1CCR1 = TA1CCR2 = 0;
+	DefinirFrequenceCliLED(FREQUENCE_MIN_LED_ROBOT);
 }

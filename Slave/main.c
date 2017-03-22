@@ -45,10 +45,7 @@ int main(void)
 
 
 	// Gestion du servomoteur
-	while (ObtenirEtatCommunicationSPI() == true) {
-		Deplacement45Degres();
-		__delay_cycles(1000000);	// Delai 1 seconde
-	}
+	while (ObtenirEtatCommunicationSPI() == true) ;
 
 
 	return 0;

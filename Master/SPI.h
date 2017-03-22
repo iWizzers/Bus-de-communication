@@ -5,7 +5,8 @@
 
 char * 			InitSPI					(void);						// Initialisation du SPI
 
-unsigned char 	TXSPI					(unsigned char donnee);		// Transmission et réception d'un caractère
+void 			TXSPI					(unsigned char donnee);		// Transmission d'un caractère
+unsigned char 	RXSPI					(void);						// Réception d'un caractère
 
 void 			ArreterCommunicationSPI	(unsigned char caractere);	// Permet d'arrêter la communication SPI
 

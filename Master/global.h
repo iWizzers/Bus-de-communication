@@ -34,8 +34,8 @@
 
 
 // Définition des distances d'un obstacle
-#define DISTANCE_MIN_OBSTACLE		850		// = 4 cm
-#define DISTANCE_MAX_OBSTACLE		525		// = 10 cm
+#define DISTANCE_MIN_OBSTACLE		655		// = 8 cm
+#define DISTANCE_MAX_OBSTACLE		400		// = 10 cm
 
 
 

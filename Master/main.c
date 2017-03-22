@@ -41,6 +41,7 @@ int main(void)
 	unsigned int 	i,
 					delai,
 					etatRobotAleatoire;
+	BOOL 			quitterModeAutonome;
 
 
     WDTCTL = WDTPW + WDTHOLD;	// Stoppe le watchdog
@@ -78,40 +79,66 @@ int main(void)
     		"> MENU PRINCIPAL <\n\n\n");
 
 
+    TXSPI('z');	// Initialisation du capteur à 90°
+    RXSPI();
+
+
 
     // Tant que l'interruption de l'UART est active
     while (ObtenirEtatCommunicationUART() == true) {
     	while (ObtenirModeRobot() == AUTONOME) {			// Boucle tant que le robot est en mode autonome
-    		etatRobotAleatoire = GenererNombre(0, 4);		// Génération d'un nombre aléatoire entre 0 et 4
+    		quitterModeAutonome = false;
 
-    		delai = GenererNombre(50, 500);					// Génération d'un délai entre 1 seconde (50) et 10 secondes (500)
+
+    		delai = GenererNombre(500, 1000);					// Génération d'un délai entre 10 secondes (500) et 20 secondes (1000)
 
     		for (i = 0; i < delai; i++) {					// Boucle en fonction du délai
-    			if (ObtenirModeRobot() == AUTONOME) {		// Si le robot est en mode autonome
-    				switch (etatRobotAleatoire) {			// En fonction du nombre généré...
-					case AVANCE:							// ...il avance
-						Avancer();
-						break;
-					case RECULE:							// ...il recule
-						Reculer();
-						break;
-					case TOURNE_DROITE:						// ...il tourne à droite
-						TournerDroite();
-						break;
-					case TOURNE_GAUCHE:						// ...il tourne à gauche
-						TournerGauche();
-						break;
-					default:								// ...il s'arrête
-						if (ObtenirEtatRobot() != ARRET) {	// Si le robot n'est pas arrêté
-							Stop(ARRET);					// Ralenti le robot
-						}
-						break;
-					}
-
-					__delay_cycles(20000);					// Délai = 50 Hz
+    			if (ObtenirModeRobot() == AUTONOME) {
+    				Avancer();
+    				__delay_cycles(20000);
     			} else {									// Sinon le robot est en mode manuel
+    				quitterModeAutonome = true;
     				break;									// Sort de la boucle du délai
     			}
+    		}
+
+
+    		if (quitterModeAutonome != true) {
+				do {
+					etatRobotAleatoire = GenererNombre(0, 4);		// Génération d'un nombre aléatoire entre 0 et 4
+				} while (etatRobotAleatoire == AVANCE);
+
+				delai = GenererNombre(50, 250);					// Génération d'un délai entre 1 seconde (50) et 5 secondes (250)
+
+				for (i = 0; i < delai; i++) {					// Boucle en fonction du délai
+					if (ObtenirModeRobot() == AUTONOME) {		// Si le robot est en mode autonome
+						switch (etatRobotAleatoire) {			// En fonction du nombre généré...
+						case AVANCE:							// ...il avance
+							Avancer();
+							break;
+						case RECULE:							// ...il recule
+							Reculer();
+							break;
+						case TOURNE_DROITE:						// ...il tourne à droite
+							TournerDroite();
+							break;
+						case TOURNE_GAUCHE:						// ...il tourne à gauche
+							TournerGauche();
+							break;
+						default:								// ...il s'arrête
+							if (ObtenirEtatRobot() != ARRET) {	// Si le robot n'est pas arrêté
+								Stop(ARRET);					// Ralenti le robot
+							}
+							break;
+						}
+
+						__delay_cycles(20000);					// Délai = 50 Hz
+					} else {									// Sinon le robot est en mode manuel
+						break;									// Sort de la boucle du délai
+					}
+				}
+    		} else {
+    			// Ne fait rien
     		}
     	}
 

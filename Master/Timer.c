@@ -120,11 +120,15 @@ BOOL ModifierFrequenceRoues(unsigned char caractere)
 			frequenceRoues = frequenceRoues / 10;
 
 			TXCharUART(caractere);
+		} else {
+			// Ne fait rien
 		}
 	} else if ((int)caractere == 13) {				// Si le caractère est 'entrée'
 		if (frequenceRoues < FREQUENCE_MIN_ROUES_ROBOT) {
 			frequenceRoues = FREQUENCE_MIN_ROUES_ROBOT;
 			TXStringUART("\nFrequence non admise. Definition frequence min : 200");
+		} else {
+			// Ne fait rien
 		}
 
 		DefinirVitesseRoues(frequenceRoues);
@@ -175,9 +179,12 @@ void IncrementerVitesseRoues(void)
 	}
 
 
-	if ((TA1CCR1 <= TA1CCR0) && (TA1CCR2 <= TA1CCR0)) {
+	if ((TA1CCR1 < TA1CCR0) && (TA1CCR2 < TA1CCR0)) {
 		TA1CCR1 += 100;
 		TA1CCR2 += 100;
+	} else {
+		TA1CCR1 = TA1CCR0;
+		TA1CCR2 = TA1CCR0;
 	}
 }
 
@@ -202,17 +209,17 @@ BOOL DecrementerVitesseRoues(void)
 	}
 
 
-	if (TA1CCR1 > 100) {
+	if (TA1CCR1 >= 100) {
 		TA1CCR1 -= 100;
 	}
 
 
-	if (TA1CCR2 > 100) {
+	if (TA1CCR2 >= 100) {
 		TA1CCR2 -= 100;
 	}
 
 
-	if ((TA1CCR1 <= 100) && (TA1CCR2 <= 100)) {
+	if ((TA1CCR1 < 100) && (TA1CCR2 < 100)) {
 		TA1CCR1 = TA1CCR2 = 0;
 		DefinirFrequenceCliLED(FREQUENCE_MIN_LED_ROBOT);
 		ret = true;
@@ -222,4 +229,41 @@ BOOL DecrementerVitesseRoues(void)
 
 
 	return ret;
+}
+
+
+
+//************************************************************
+// Fonction CorrigerErreurRoues : Permet de corriger l'erreur des optocoupleurs des roues
+//
+//       Entrées :
+//                 unsigned char : nombre d'incréments de la roue A
+//                 unsigned char : nombre d'incréments de la roue B
+//
+//       Sorties :
+//                 NULL
+//************************************************************
+void CorrigerErreurRoues(unsigned char incrementsRoueA, unsigned char incrementsRoueB)
+{
+	/*unsigned int valeur;
+
+	if (incrementsRoueA > incrementsRoueB) {
+		valeur = TA1CCR1 * (incrementsRoueA - incrementsRoueB) / 100;
+
+		if (TA1CCR1 < TA1CCR0) {
+			TA1CCR1 = valeur;
+		} else {
+			// Ne fait rien
+		}
+	} else if (incrementsRoueA < incrementsRoueB) {
+		valeur = TA1CCR2 * (incrementsRoueB - incrementsRoueA) / 100;
+
+		if (TA1CCR2 < TA1CCR0) {
+			TA1CCR2 = valeur;
+		} else {
+			// Ne fait rien
+		}
+	} else {
+		// Ne fait rien
+	}*/
 }
