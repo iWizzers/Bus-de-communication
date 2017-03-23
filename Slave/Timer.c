@@ -91,5 +91,5 @@ void Scan180Degres(void)
 	position += deplacement45Degres;
 	TACCR1 = position;
 
-	__delay_cycles(500000);
+	__delay_cycles(250000);
 }

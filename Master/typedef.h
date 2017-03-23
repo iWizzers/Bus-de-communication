@@ -3,6 +3,7 @@
 
 
 
+// Typedef permettant d'utiliser soit 0, soit 1
 typedef enum
 {
 	false = 0,

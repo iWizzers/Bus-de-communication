@@ -14,8 +14,8 @@
 
 
 
-BOOL 	reception 			= false,
-		etatCommunication 	= true;
+BOOL 	reception 			= false,	// Variable contenant l'utilisation du terminal
+		etatCommunication 	= true;		// Variable contenant l'état de la communication avec le terminal
 
 
 
@@ -102,7 +102,7 @@ void TXCharUART(unsigned char carac)
 //************************************************************
 void DefinirReceptionUART(BOOL etat)
 {
-	reception = etat;
+	reception = etat;	// Modification de l'utilisation du terminal
 }
 
 

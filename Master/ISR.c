@@ -18,9 +18,9 @@
 
 
 
-unsigned int 	menu = MENU_PRINCIPAL;
-unsigned char 	nbIncrementRoueA = 0,
-				nbIncrementRoueB = 0;
+unsigned int 	menu = MENU_PRINCIPAL;	// Variable contenant le type de menu
+unsigned char 	nbIncrementRoueA = 0,	// Variable contenant le nombre d'incrément du codeur optique de la roue A
+				nbIncrementRoueB = 0;	// Variable contenant le nombre d'incrément du codeur optique de la roue B
 
 
 
@@ -46,6 +46,8 @@ __interrupt void USCI0RX_ISR(void)
     		if (ModifierFrequenceRoues(c) == true) {
     			menu = MENU_PRINCIPAL;
 				DefinirReceptionUART(true);
+    		} else {
+    			// Ne fait rien
     		}
 		} else {									// Sinon
 			switch (c) {
@@ -82,7 +84,6 @@ __interrupt void USCI0RX_ISR(void)
 				TXStringUART(	"\n\nPassage en mode autonome"
 								"\n\n_______________________________\n\n\n");
 
-				TXSPI('z');	// Initialisation du capteur à 90°
 				DefinirModeRobot(AUTONOME);
 
 				DefinirReceptionUART(true);
@@ -136,10 +137,10 @@ __interrupt void USCI0RX_ISR(void)
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void Timer0Interrupt(void)
 {
-	if (ObtenirEtatGPIOPort1(BIT_LED_ROUGE) == true) {
-		ActiverGPIOPort1(BIT_LED_ROUGE, false);
-	} else {
-		ActiverGPIOPort1(BIT_LED_ROUGE, true);
+	if (ObtenirEtatGPIOPort1(BIT_LED_ROUGE) == true) {	// Si la LED rouge est allumée
+		ActiverGPIOPort1(BIT_LED_ROUGE, false);			// ... on l'éteint
+	} else {											// Sinon
+		ActiverGPIOPort1(BIT_LED_ROUGE, true);			// ... on l'allume
 	}
 
 
@@ -160,17 +161,24 @@ __interrupt void Timer0Interrupt(void)
 #pragma vector=TIMER1_A1_VECTOR
 __interrupt void Timer1Interrupt(void)
 {
-	if ((nbIncrementRoueA == 15) || (nbIncrementRoueB == 15)) {
-		CorrigerErreurRoues(nbIncrementRoueA, nbIncrementRoueB);
+	if ((nbIncrementRoueA == 15) || (nbIncrementRoueB == 15)) {		// Si le nombre d'incréments des codeurs optiques sont égales à 1 tour de roue (15 incréments)
+		CorrigerErreurRoues(nbIncrementRoueA, nbIncrementRoueB);	// ... on corrige l'erreur
 
-		nbIncrementRoueA = nbIncrementRoueB = 0;
-	} else {
-		if (P2IN & BIT_OPTO_COUPLEUR_ROUE_A)
-			nbIncrementRoueA++;
+		nbIncrementRoueA = nbIncrementRoueB = 0;					// ... RAZ des variables des codeurs optiques
+	} else {														// Sinon
+		if (P2IN & BIT_OPTO_COUPLEUR_ROUE_A) {						// Si l'entrée du codeur optique de la roue A est à '1'
+			nbIncrementRoueA++;										// ... on incrémente sa variable
+		} else {
+			// Ne fait rien
+		}
 
-		if (P2IN & BIT_OPTO_COUPLEUR_ROUE_B)
-			nbIncrementRoueB++;
+		if (P2IN & BIT_OPTO_COUPLEUR_ROUE_B) {						// Si l'entrée du codeur optique de la roue A est à '1'
+			nbIncrementRoueB++;										// ... on incrémente sa variable
+		} else {
+			// Ne fait rien
+		}
 	}
+
 
 	TA1CTL &= ~TAIFG; //RAZ TAIFG
 }

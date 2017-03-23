@@ -118,5 +118,5 @@ unsigned char RXSPI(void)
 //************************************************************
 void ArreterCommunicationSPI(unsigned char caractere)
 {
-	TXSPI(caractere);
+	TXSPI(caractere);		// Transmet le caractère d'arrêt
 }

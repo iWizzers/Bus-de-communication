@@ -15,6 +15,13 @@ void 			TournerGauche		(void);					// Permet de faire tourner le robot à gauche
 void			Stop				(unsigned char etat);	// Permet de ralentir puis de stopper le robot
 void 			ArretUrgence		(void);					// Permet de stopper net le robot
 
+void 			BalayageCapteur		(void);					// Permet de balayer le devant du robot jusqu'à 180°
+
+void 			CommandeAutonome	(void);					// Permet de gérer le robot en mode autonome
+void 			CommandeManuelle	(void);					// Permet de gérer le robot en mode manuel
+
+int 			GenererNombre(int min, int max);			// Permet de générer un nombre aléatoire entre deux bornes
+
 
 
 #endif /* ROBOT_H_ */
