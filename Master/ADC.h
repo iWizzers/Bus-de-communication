@@ -3,9 +3,13 @@
 
 
 
-char * 	InitADC							(void);					// Initialisation du convertisseur analogique-numerique
+#include "typedef.h"
 
-int 	ObtenirResultatConversionADC	(unsigned char voie);	// Permet de lire le résultat de la conversion analogique-numérique
+
+
+void 		InitADC							(void);					// Initialisation du convertisseur analogique-numerique
+
+SINT_32 	ObtenirResultatConversionADC	(UCHAR voie);	// Permet de lire le résultat de la conversion analogique-numérique
 
 
 

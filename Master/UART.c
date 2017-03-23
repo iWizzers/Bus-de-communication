@@ -33,14 +33,10 @@ void InitUART(void)
     UCA0BR0 = 104;              // 1MHz, 9600
     UCA0BR1 = 0;                // 1MHz, 9600
 
-    UCA0CTL0 &= ~UCPEN & ~UCPAR & ~UCMSB;
-    UCA0CTL0 &= ~UC7BIT & ~UCSPB & ~UCMODE1;
-    UCA0CTL0 &= ~UCMODE0 & ~UCSYNC;
-    UCA0CTL1 |= UCSSEL_2;       // SMCLK
+	UCA0CTL0 = 0;
+    UCA0CTL1 = UCSSEL_2;       // SMCLK
 
-    UCA0CTL1 &= ~UCSWRST;       // **Initialize USCI state machine**
-
-    IE2 |= UCA0RXIE;            // Enable USCI_A0 RX interrupt
+    IE2 += UCA0RXIE;            // Enable USCI_A0 RX interrupt
 }
 
 
@@ -54,9 +50,9 @@ void InitUART(void)
 //       Sorties :
 //                 NULL
 //************************************************************
-void TXStringUART(char *chaine)
+void TXStringUART(char * chaine)
 {
-	int i,
+	SINT_32 i,
 		nbOctetsALire = 0;
 
 
@@ -67,8 +63,10 @@ void TXStringUART(char *chaine)
 
 
 	for (i = 0; i < nbOctetsALire; i++) {
-		while (!(IFG2 & UCA0TXIFG)) ;	// Attend que le buffer de transmission soit libre
-		UCA0TXBUF = chaine[i];       	// Transmission du caractère
+		while (!(IFG2 & UCA0TXIFG)) {
+			// Attend que le buffer de transmission soit libre
+		}
+		UCA0TXBUF = (SINT_32)chaine[i];       	// Transmission du caractère
 	}
 }
 
@@ -83,10 +81,12 @@ void TXStringUART(char *chaine)
 //       Sorties :
 //                 NULL
 //************************************************************
-void TXCharUART(unsigned char carac)
+void TXCharUART(UCHAR carac)
 {
-	while (!(IFG2 & UCA0TXIFG)) ;	// Attend que le buffer de transmission soit libre
-	UCA0TXBUF = carac;       		// Transmission du caractère
+	while (!(IFG2 & UCA0TXIFG)) {
+		// Attend que le buffer de transmission soit libre
+	}
+	UCA0TXBUF = (SINT_32)carac;       		// Transmission du caractère
 }
 
 
@@ -118,7 +118,7 @@ void DefinirReceptionUART(BOOL etat)
 //************************************************************
 BOOL ObtenirReceptionUART(void)
 {
-	return reception;
+	return reception;		// Retourne si un caractère a été reçu
 }
 
 
@@ -137,21 +137,21 @@ void ArreterCommunicationUART(void)
 	etatCommunication = false;
 
 	// Désactivation de l'interruption UART
-	IE2 &= ~UCA0RXIE;
+	IE2 -= UCA0RXIE;
 
 
 	// Arrêt du robot
-	while (ObtenirEtatRobot() != ARRET) {
+	while (ObtenirEtatRobot() != (UCHAR)ARRET) {
 		__delay_cycles(25000);
 		Stop(ARRET);
 	}
 
 	// Désactivation de l'interruption des timers
-	TA0CTL &= ~TAIE;
-	TA1CTL &= ~TAIE;
+	TA0CTL -= TAIE;
+	TA1CTL -= TAIE;
 
 	// Allumage LED rouge pour signifier la fin du programme
-	P1OUT = 0 | BIT_LED_ROUGE;
+	P1OUT = BIT_LED_ROUGE;
 }
 
 
@@ -167,5 +167,5 @@ void ArreterCommunicationUART(void)
 //************************************************************
 BOOL ObtenirEtatCommunicationUART(void)
 {
-	return etatCommunication;
+	return etatCommunication;	// Retourne l'état de la communication UART
 }

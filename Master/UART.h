@@ -9,8 +9,8 @@
 
 void 	InitUART						(void);					// Initialisation du SPI
 
-void 	TXStringUART					(char *chaine);			// Transmission d'une chaine de caractères
-void 	TXCharUART						(unsigned char carac);	// Transmission d'un caractère
+void 	TXStringUART					(char * chaine);			// Transmission d'une chaine de caractères
+void 	TXCharUART						(UCHAR carac);	// Transmission d'un caractère
 
 void 	DefinirReceptionUART			(BOOL etat);			// Définition de l'état de la réception
 BOOL 	ObtenirReceptionUART			(void);					// Récupération de l'état de la réception

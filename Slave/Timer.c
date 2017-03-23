@@ -14,8 +14,8 @@
 
 
 
-unsigned int 	position 	= _0_DEGRE,
-				deplacement45Degres;
+SINT_32 	position 	= _0_DEGRE;
+SINT_32 	deplacement45Degres;
 
 
 
@@ -30,7 +30,7 @@ unsigned int 	position 	= _0_DEGRE,
 //************************************************************
 void InitPWM(void)
 {
-	TACTL = (TASSEL_2 | MC_1 | ID_0); 	// Source SMCLK pour TimerA, mode comptage Up, pas de prédivision
+	TACTL = TASSEL_2 + MC_1 + ID_0; 	// Source SMCLK pour TimerA, mode comptage Up, pas de prédivision
 	TACCTL1 = OUTMOD_7; 				// Activation mode de sortie n°7
 	TACCR0 = 20000; 					// Détermine la période du signal
 
@@ -50,10 +50,8 @@ void InitPWM(void)
 //************************************************************
 void Init0Degre(void)
 {
-	position = _0_DEGRE;
-	TACCR1 = position;
-
-	__delay_cycles(500000);
+	position = _0_DEGRE;		// Variable à la position de 0°
+	TACCR1 = position;		// PWM à la valeur de 0°
 }
 
 
@@ -69,10 +67,8 @@ void Init0Degre(void)
 //************************************************************
 void Init90Degres(void)
 {
-	position = _0_DEGRE + 2 * deplacement45Degres;
-	TACCR1 = position;
-
-	__delay_cycles(500000);
+	position = (SINT_32)_0_DEGRE + (2 * (SINT_32)deplacement45Degres);	// Variable à la position de 90°
+	TACCR1 = position;									// PWM à la valeur de 90°
 }
 
 
@@ -88,8 +84,6 @@ void Init90Degres(void)
 //************************************************************
 void Scan180Degres(void)
 {
-	position += deplacement45Degres;
-	TACCR1 = position;
-
-	__delay_cycles(250000);
+	position += deplacement45Degres;		// Balayage de la zone
+	TACCR1 = position;					// PWM incrémenté de 45°
 }

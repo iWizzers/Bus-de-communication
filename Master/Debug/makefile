@@ -127,32 +127,32 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Master.out \
+Master_2.out \
 
 EXE_OUTPUTS__QUOTED += \
-"Master.out" \
+"Master_2.out" \
 
 BIN_OUTPUTS += \
-Master.hex \
+Master_2.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"Master.hex" \
+"Master_2.hex" \
 
 
 # All Target
-all: Master.out
+all: Master_2.out
 
 # Tool invocations
-Master.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+Master_2.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/cl430" -vmsp -O0 --use_hw_mpy=none --advice:power=all -g --define=__MSP430G2553__ --diag_warning=225 --diag_wrap=off --display_error_number --printf_support=minimal -z -m"Master.map" --stack_size=80 --heap_size=80 -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="Master_linkInfo.xml" --use_hw_mpy=none --rom_model -o "Master.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/cl430" -vmsp --use_hw_mpy=none --advice:power=all -g --define=__MSP430G2553__ --diag_warning=225 --diag_wrap=off --display_error_number --printf_support=minimal -z -m"Master_2.map" --stack_size=80 --heap_size=80 -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="Master_2_linkInfo.xml" --use_hw_mpy=none --rom_model -o "Master_2.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-Master.hex: $(EXE_OUTPUTS)
+Master_2.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: MSP430 Hex Utility'
-	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/hex430" --memwidth=8 --romwidth=8 -o "Master.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/hex430" --memwidth=8 --romwidth=8 -o "Master_2.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 

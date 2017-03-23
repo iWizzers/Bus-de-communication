@@ -40,12 +40,13 @@ BOOL 	etatCommunication 	= true;
 //                 NULL
 //************************************************************
 void InitSPI(void){
-	USICTL0 |= USISWRST;                 			// Réglage configuration
+	USICTL0 = USISWRST;                 			// Réglage configuration
 
-	USICTL0 |= USIPE7 + USIPE6 + USIPE5 + USIOE;	// SPI esclave
-	USICTL1 |= USIIE | USICKPH;                     // Interruption + Phase
+	USICTL0 += USIPE7 + USIPE6 + USIPE5 + USIOE;	// SPI esclave
 
-	USICTL0 &= ~USISWRST;                 			// Libération du SPI
+	USICTL1 = USIIE + USICKPH;                     // Interruption + Phase
+
+	USICTL0 -= USISWRST;                 			// Libération du SPI
 }
 
 
@@ -54,14 +55,14 @@ void InitSPI(void){
 // Fonction TXSPI
 //
 //       Entrées :
-//                 unsigned char : caractère à envoyer
+//                 UCHAR : caractère à envoyer
 //
 //       Sorties :
 //                 NULL
 //************************************************************
-void TXSPI(unsigned char carac)
+void TXSPI(UCHAR carac)
 {
-	USISRL = carac << 1;	// Décalage du caractère de 1 bit vers la gauche
+	USISRL = (SINT_32)carac << 1;	// Décalage du caractère de 1 bit vers la gauche
 	USICNT = 8;				// Envoi de 8 bits
 }
 
@@ -74,12 +75,14 @@ void TXSPI(unsigned char carac)
 //                 NULL
 //
 //       Sorties :
-//                 unsigned char : caractère reçu
+//                 UCHAR : caractère reçu
 //************************************************************
-unsigned char RXSPI(void){
-	while((USIIFG & USICTL1) != BIT0); // Scrutation
+UCHAR RXSPI(void){
+	while((USIIFG & USICTL1) != BIT0) {
+		// Scrutation
+	}
 
-	return USISRL;
+	return (UCHAR)USISRL;	// Retourne le caractère reçu sur le SPI
 }
 
 
@@ -98,13 +101,13 @@ void ArreterCommunicationSPI(void)
 	etatCommunication = false;
 
 	// Désactivation de l'interruption SPI
-	USICTL1 &= ~USIIE;
+	USICTL1 -= USIIE;
 
 	// Désactivation du servomoteur
-	P1DIR &= ~BIT_SERVOMOTEUR;
+	P1DIR -= BIT_SERVOMOTEUR;
 
 	// Allumage LED rouge pour signifier la fin du programme
-	P1OUT = 0 | BIT_LED_ROUGE;
+	P1OUT = BIT_LED_ROUGE;
 }
 
 
@@ -120,5 +123,5 @@ void ArreterCommunicationSPI(void)
 //************************************************************
 BOOL ObtenirEtatCommunicationSPI(void)
 {
-	return etatCommunication;
+	return etatCommunication;	// Retourne l'état de la communication avec l'UART
 }

@@ -36,18 +36,13 @@
 //       Sorties :
 //                 char * : chaine de caractère donnant l'état de l'initialisation
 //************************************************************
-char * InitSPI(void)
+void InitSPI(void)
 {
-	UCB0CTL0 = 0 | (UCMSB | UCMST);		// MSB en premier + SPI en maitre
-	UCB0CTL1 |= UCSSEL_2;				// SMCLK
+	UCB0CTL0 = UCMSB + UCMST;		// MSB en premier + SPI en maitre
+	UCB0CTL1 = UCSSEL_2;				// SMCLK
 
 	UCB0BR0 = 104;						// 1MHz, 9600
 	UCB0BR1 = 0;						// 1MHz, 9600
-
-	UCB0CTL1 &= ~UCSWRST;				// **Initialize USCI state machine**
-
-
-	return "OK";
 }
 
 
@@ -61,17 +56,21 @@ char * InitSPI(void)
 //       Sorties :
 //                 NULL
 //************************************************************
-void TXSPI(unsigned char donnee)
+void TXSPI(UCHAR donnee)
 {
-	ActiverGPIOPort1(BIT_CS, false); 	// Sélection de l'esclave
+	ActiverGPIOPort1((UCHAR)BIT_CS, false); 	// Sélection de l'esclave
 
 
-	while (!(IFG2 & UCB0TXIFG)) ;  		// Attend que le buffer d'envoi soit libre
-	UCB0TXBUF = donnee;              	// Transmission du caractère
+	while (!(IFG2 & UCB0TXIFG)) {
+  		// Attend que le buffer d'envoi soit libre
+	}
+	UCB0TXBUF = (SINT_32)donnee;              	// Transmission du caractère
 	__delay_cycles(50);					// Délai pour l'esclave
 
 
-	while (!(IFG2 & UCB0TXIFG)) ;  		// Attend que le buffer d'envoi soit libre
+	while (!(IFG2 & UCB0TXIFG)) {
+  		// Attend que le buffer d'envoi soit libre
+	}
 	UCB0TXBUF = 0;              		// Transmission du caractère NULL
 	__delay_cycles(50);					// Délai pour l'esclave
 }
@@ -87,19 +86,23 @@ void TXSPI(unsigned char donnee)
 //       Sorties :
 //                 unsigned char : caractère reçu
 //************************************************************
-unsigned char RXSPI(void)
+UCHAR RXSPI(void)
 {
-	unsigned char retour;
+	UCHAR retour;
 
 
-	while (!(IFG2 & UCB0RXIFG)) ; 		// Attend que le buffer de réception soit libre
+	while (!(IFG2 & UCB0RXIFG)) {
+ 		// Attend que le buffer de réception soit libre
+	}
 	retour = UCB0RXBUF;					// Lecture du caractère NULL
 
-	while (!(IFG2 & UCB0RXIFG)) ; 		// Attend que le buffer de réception soit libre
-	retour = UCB0RXBUF;					// Lecture du caractère à recevoir
+	while (!(IFG2 & UCB0RXIFG)) {
+ 		// Attend que le buffer de réception soit libre
+	}
+	retour = (UCHAR)UCB0RXBUF;					// Lecture du caractère à recevoir
 
 
-	ActiverGPIOPort1(BIT_CS, true);		// Libération de l'esclave
+	ActiverGPIOPort1((UCHAR)BIT_CS, true);		// Libération de l'esclave
 
 
 	return retour;
@@ -116,7 +119,7 @@ unsigned char RXSPI(void)
 //       Sorties :
 //                 NULL
 //************************************************************
-void ArreterCommunicationSPI(unsigned char caractere)
+void ArreterCommunicationSPI(UCHAR caractere)
 {
 	TXSPI(caractere);		// Transmet le caractère d'arrêt
 }

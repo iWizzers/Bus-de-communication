@@ -3,12 +3,16 @@
 
 
 
-char * 			InitSPI					(void);						// Initialisation du SPI
+#include "typedef.h"
 
-void 			TXSPI					(unsigned char donnee);		// Transmission d'un caractère
-unsigned char 	RXSPI					(void);						// Réception d'un caractère
 
-void 			ArreterCommunicationSPI	(unsigned char caractere);	// Permet d'arrêter la communication SPI
+
+void 		InitSPI					(void);						// Initialisation du SPI
+
+void 		TXSPI					(UCHAR donnee);		// Transmission d'un caractère
+UCHAR 	RXSPI					(void);						// Réception d'un caractère
+
+void 		ArreterCommunicationSPI	(UCHAR caractere);	// Permet d'arrêter la communication SPI
 
 
 

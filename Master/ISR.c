@@ -18,9 +18,7 @@
 
 
 
-unsigned int 	menu = MENU_PRINCIPAL;	// Variable contenant le type de menu
-unsigned char 	nbIncrementRoueA = 0,	// Variable contenant le nombre d'incrément du codeur optique de la roue A
-				nbIncrementRoueB = 0;	// Variable contenant le nombre d'incrément du codeur optique de la roue B
+SINT_32 	menu = MENU_PRINCIPAL;	// Variable contenant le type de menu
 
 
 
@@ -36,10 +34,10 @@ unsigned char 	nbIncrementRoueA = 0,	// Variable contenant le nombre d'incrément
 #pragma vector=USCIAB0RX_VECTOR
 __interrupt void USCI0RX_ISR(void)
 {
-    unsigned char c = UCA0RXBUF;	// Réception du caractère sur l'UART
+    UCHAR c = UCA0RXBUF;	// Réception du caractère sur l'UART
 
 
-    if (ObtenirModeRobot() == AUTONOME) {
+    if (ObtenirModeRobot() == (UCHAR)AUTONOME) {
     	DefinirModeRobot(MANUEL);
     } else {
     	if (menu == MENU_PARAMETRE_FREQ_CLI_LED) {	// Si nous modifions la PWM
@@ -51,7 +49,7 @@ __interrupt void USCI0RX_ISR(void)
     		}
 		} else {									// Sinon
 			switch (c) {
-			case 'h':	// Affichage de l'aide
+			case (UCHAR)'h':	// Affichage de l'aide
 				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
 				TXStringUART(	"\n\n====== AIDE MENU PRINCIPAL ======\n"
@@ -67,7 +65,7 @@ __interrupt void USCI0RX_ISR(void)
 
 				DefinirReceptionUART(true);
 				break;
-			case 'e':	// Exctinction de la communication
+			case (UCHAR)'e':	// Exctinction de la communication
 				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
 				TXStringUART(	"\n\nExtinction de la communication"
@@ -78,7 +76,7 @@ __interrupt void USCI0RX_ISR(void)
 
 				DefinirReceptionUART(true);
 				break;
-			case 'a':
+			case (UCHAR)'a':
 				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
 				TXStringUART(	"\n\nPassage en mode autonome"
@@ -88,7 +86,7 @@ __interrupt void USCI0RX_ISR(void)
 
 				DefinirReceptionUART(true);
 				break;
-			case 'p':	// Réglage de la PWM
+			case (UCHAR)'p':	// Réglage de la PWM
 				TXCharUART(c);	// Affichage du caractère reçu sur le terminal
 
 				TXStringUART(	"\n\nModifier la vitesse maximale"
@@ -96,16 +94,16 @@ __interrupt void USCI0RX_ISR(void)
 
 				menu = MENU_PARAMETRE_FREQ_CLI_LED;
 				break;
-			case 'z':
+			case (UCHAR)'z':
 				Avancer();
 				break;
-			case 'q':
+			case (UCHAR)'q':
 				TournerGauche();
 				break;
-			case 's':
+			case (UCHAR)'s':
 				Reculer();
 				break;
-			case 'd':
+			case (UCHAR)'d':
 				TournerDroite();
 				break;
 			default:	// Touche inconnue
@@ -137,14 +135,14 @@ __interrupt void USCI0RX_ISR(void)
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void Timer0Interrupt(void)
 {
-	if (ObtenirEtatGPIOPort1(BIT_LED_ROUGE) == true) {	// Si la LED rouge est allumée
-		ActiverGPIOPort1(BIT_LED_ROUGE, false);			// ... on l'éteint
+	if (ObtenirEtatGPIOPort1((UCHAR)BIT_LED_ROUGE) == true) {	// Si la LED rouge est allumée
+		ActiverGPIOPort1((UCHAR)BIT_LED_ROUGE, false);			// ... on l'éteint
 	} else {											// Sinon
-		ActiverGPIOPort1(BIT_LED_ROUGE, true);			// ... on l'allume
+		ActiverGPIOPort1((UCHAR)BIT_LED_ROUGE, true);			// ... on l'allume
 	}
 
 
-	TA0CTL &= ~TAIFG; //RAZ TAIFG
+	TA0CTL -= TAIFG; //RAZ TAIFG
 }
 
 
@@ -161,24 +159,5 @@ __interrupt void Timer0Interrupt(void)
 #pragma vector=TIMER1_A1_VECTOR
 __interrupt void Timer1Interrupt(void)
 {
-	if ((nbIncrementRoueA == 15) || (nbIncrementRoueB == 15)) {		// Si le nombre d'incréments des codeurs optiques sont égales à 1 tour de roue (15 incréments)
-		CorrigerErreurRoues(nbIncrementRoueA, nbIncrementRoueB);	// ... on corrige l'erreur
-
-		nbIncrementRoueA = nbIncrementRoueB = 0;					// ... RAZ des variables des codeurs optiques
-	} else {														// Sinon
-		if (P2IN & BIT_OPTO_COUPLEUR_ROUE_A) {						// Si l'entrée du codeur optique de la roue A est à '1'
-			nbIncrementRoueA++;										// ... on incrémente sa variable
-		} else {
-			// Ne fait rien
-		}
-
-		if (P2IN & BIT_OPTO_COUPLEUR_ROUE_B) {						// Si l'entrée du codeur optique de la roue A est à '1'
-			nbIncrementRoueB++;										// ... on incrémente sa variable
-		} else {
-			// Ne fait rien
-		}
-	}
-
-
-	TA1CTL &= ~TAIFG; //RAZ TAIFG
+	TA1CTL -= TAIFG;		// RAZ TAIFG
 }

@@ -3,6 +3,11 @@
 
 
 
+typedef unsigned char		UCHAR;
+typedef unsigned int		UINT_32;
+typedef signed int			SINT_32;
+
+
 typedef enum
 {
 	false = 0,

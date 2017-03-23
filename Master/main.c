@@ -39,11 +39,11 @@ void Init(void)
 
 	TXStringUART("====== Initialisation ======");
 	TXStringUART("\nPWM ...");
-	TXStringUART(InitPWM());		// PWM
+	InitPWM();		// PWM
 	TXStringUART("\nSPI ...");
-	TXStringUART(InitSPI());		// SPI en master
+	InitSPI();		// SPI en master
 	TXStringUART("\nADC ...");
-	TXStringUART(InitADC());		// Conversion analogique-numérique
+	InitADC();		// Conversion analogique-numérique
 	TXStringUART("\n====== Fin initialisation ======\n\n\n");
 
 
@@ -52,8 +52,8 @@ void Init(void)
 
 
 	// Initialisation du capteur à 90°
-	TXSPI('z');
-	RXSPI();
+	TXSPI((UCHAR)'z');
+	(void)RXSPI();
 
 
 	TXStringUART(	"====== Bienvenue dans la gestion du Robot RH-5321 ! ======\n\n\n"
@@ -65,7 +65,7 @@ void Init(void)
 
 
 	// Exctinction de la LED rouge si l'initialisation est un succès
-	ActiverGPIOPort1(BIT_LED_ROUGE, false);
+	ActiverGPIOPort1((UCHAR)BIT_LED_ROUGE, false);
 }
 
 
@@ -94,7 +94,7 @@ int main(void)
 
     // Tant que l'interruption de l'UART est active
     while (ObtenirEtatCommunicationUART() == true) {
-    	if (ObtenirModeRobot() == AUTONOME) {	// Boucle tant que le robot est en mode autonome
+    	if (ObtenirModeRobot() == (UCHAR)AUTONOME) {	// Boucle tant que le robot est en mode autonome
     		CommandeAutonome();
     	} else {								// Boucle tant que le robot est en mode manuel
     		CommandeManuelle();

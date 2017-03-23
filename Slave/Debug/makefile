@@ -124,32 +124,32 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Slave.out \
+Slave_2.out \
 
 EXE_OUTPUTS__QUOTED += \
-"Slave.out" \
+"Slave_2.out" \
 
 BIN_OUTPUTS += \
-Slave.hex \
+Slave_2.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"Slave.hex" \
+"Slave_2.hex" \
 
 
 # All Target
-all: Slave.out
+all: Slave_2.out
 
 # Tool invocations
-Slave.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+Slave_2.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/cl430" -vmsp --use_hw_mpy=none --advice:power=all -g --define=__MSP430G2231__ --diag_warning=225 --diag_wrap=off --display_error_number --printf_support=minimal -z -m"Slave.map" --stack_size=50 --heap_size=0 -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="Slave_linkInfo.xml" --use_hw_mpy=none --rom_model -o "Slave.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/cl430" -vmsp --use_hw_mpy=none --advice:power=all -g --define=__MSP430G2231__ --diag_warning=225 --diag_wrap=off --display_error_number --printf_support=minimal -z -m"Slave_2.map" --stack_size=50 --heap_size=0 -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="Slave_2_linkInfo.xml" --use_hw_mpy=none --rom_model -o "Slave_2.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-Slave.hex: $(EXE_OUTPUTS)
+Slave_2.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: MSP430 Hex Utility'
-	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/hex430" --memwidth=8 --romwidth=8 -o "Slave.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv6/tools/compiler/msp430_15.12.3.LTS/bin/hex430" --memwidth=8 --romwidth=8 -o "Slave_2.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
